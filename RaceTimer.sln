@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.App", "RaceTimer.App\RaceTimer.App.csproj", "{2AA19829-EBE4-4DDE-9692-C6E4B05E947A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.Data", "RaceTimer.Data\RaceTimer.Data.csproj", "{76892C81-BD30-4233-B2A9-D9DDB20DA23C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.Business", "RaceTimer.Business\RaceTimer.Business.csproj", "{FCA07CC2-5A43-4C1D-8A05-E9E21348FB3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.Device.IntegratedReaderR2000", "RaceTimer.Device.IntegratedReaderR2000\RaceTimer.Device.IntegratedReaderR2000.csproj", "{078A3161-9608-4FFD-B6E4-6310A572FEAD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2AA19829-EBE4-4DDE-9692-C6E4B05E947A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AA19829-EBE4-4DDE-9692-C6E4B05E947A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AA19829-EBE4-4DDE-9692-C6E4B05E947A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AA19829-EBE4-4DDE-9692-C6E4B05E947A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76892C81-BD30-4233-B2A9-D9DDB20DA23C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76892C81-BD30-4233-B2A9-D9DDB20DA23C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76892C81-BD30-4233-B2A9-D9DDB20DA23C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76892C81-BD30-4233-B2A9-D9DDB20DA23C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCA07CC2-5A43-4C1D-8A05-E9E21348FB3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCA07CC2-5A43-4C1D-8A05-E9E21348FB3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCA07CC2-5A43-4C1D-8A05-E9E21348FB3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCA07CC2-5A43-4C1D-8A05-E9E21348FB3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{078A3161-9608-4FFD-B6E4-6310A572FEAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{078A3161-9608-4FFD-B6E4-6310A572FEAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{078A3161-9608-4FFD-B6E4-6310A572FEAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{078A3161-9608-4FFD-B6E4-6310A572FEAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

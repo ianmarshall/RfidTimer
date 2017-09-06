@@ -22,7 +22,7 @@ namespace RaceTimer.Data
     {
         Session1SingleTarget = 1,
         Session2DualTarget = 2,
-        Session3DualTarget = 3,
+        Session3DualTargetWithSuppression = 3,
     }
 
     public class ReaderProfile

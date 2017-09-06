@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Caliburn.Micro;
 
-namespace RaceTimer.Business
+namespace RaceTimer.App.ViewModels
 {
-    public class Class1
+   public class MainViewModel : PropertyChangedBase
     {
     }
 }

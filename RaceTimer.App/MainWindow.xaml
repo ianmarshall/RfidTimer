@@ -4,11 +4,26 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RaceTimer.App"
+        xmlns:views="clr-namespace:RaceTimer.App.Views" 
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" 
         Closing="Window_Closing">
     <Grid>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="96,67,0,0" VerticalAlignment="Top" Width="247" Height="73" Click="button_Click"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Ribbon x:Name="RibbonWin"  SelectedIndex="0">
 
+            <RibbonTab Header="Home" KeyTip="H" >
+                <!-- Home  group-->
+
+            </RibbonTab>
+            <RibbonTab   Header="Race" KeyTip="R" >
+                <RibbonButton  Width="auto" Height="auto" Label="Start"  Content="Start" Click="button_Click"/>
+                
+            </RibbonTab>
+
+        </Ribbon>
     </Grid>
 </Window>

@@ -16,15 +16,17 @@ using System.Windows.Shapes;
 namespace RaceTimer.App.Views
 {
     /// <summary>
-    /// Interaction logic for SplitView.xaml
+    /// Interaction logic for ReadersView.xaml
     /// </summary>
-    public partial class SplitsView : UserControl
+    public partial class ReadersView : UserControl
     {
-        public SplitsView()
+        public ReadersView()
         {
             InitializeComponent();
+            var numberButtons = Enumerable.Range(1, 30)
+                .Select(r => new KeyValuePair<string, string>(r.ToString(), r.ToString()))
+                .ToList();
+            numberButtonItems.ItemsSource = numberButtons;
         }
-
-       
     }
 }

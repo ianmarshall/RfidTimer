@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using Caliburn.Micro;
 
 namespace RaceTimer.App.Views
 {
    
-    public class SplitsViewModel : PropertyChangedBase
+    public class SplitsViewModel 
     {
         public ObservableCollection<Split> Splits;
 
@@ -17,7 +16,6 @@ namespace RaceTimer.App.Views
             set
             {
                 _startTime = value;
-                NotifyOfPropertyChange(() => StartTime);
             }
         }
 

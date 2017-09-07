@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.Business", "RaceT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.Device.IntegratedReaderR2000", "RaceTimer.Device.IntegratedReaderR2000\RaceTimer.Device.IntegratedReaderR2000.csproj", "{078A3161-9608-4FFD-B6E4-6310A572FEAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.Common", "RaceTimer.Common\RaceTimer.Common.csproj", "{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{078A3161-9608-4FFD-B6E4-6310A572FEAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{078A3161-9608-4FFD-B6E4-6310A572FEAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{078A3161-9608-4FFD-B6E4-6310A572FEAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

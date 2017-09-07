@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace RaceTimer.App.Views
 {
     /// <summary>
-    /// Interaction logic for MainView.xaml
+    /// Interaction logic for AthletesView.xaml
     /// </summary>
-    public partial class MainView : UserControl
+    public partial class AthletesView : UserControl
     {
-        public MainView()
+        public AthletesView()
         {
             InitializeComponent();
         }

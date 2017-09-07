@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,8 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+using RaceTimer.Business;
 using RaceTimer.Data;
-using RaceTimer.Device.IntegratedReaderR2000;
+
 
 namespace RaceTimer.App
 {
@@ -23,22 +26,53 @@ namespace RaceTimer.App
     public partial class MainWindow : Window
     {
 
-        private Adapter adapter;
+    
 
         public MainWindow()
         {
             InitializeComponent();
+          
+            _rfidManager = new RfidManager();
 
-            Adapter adapter = new Adapter();
+
+        }
+
+
+     
+
+        DispatcherTimer dt = new DispatcherTimer();
+        Stopwatch sw = new Stopwatch();
+        string _currentTime = string.Empty;
+
+        private RfidManager _rfidManager;
+
+
+
+        //void dt_Tick(object sender, EventArgs e)
+        //{
+        //    _rfidManager.SetUp();
+
+        //    if (sw.IsRunning)
+        //    {
+        //        TimeSpan ts = sw.Elapsed;
+        //        _currentTime = String.Format("{0:00}:{1:00}:{2:00}",
+        //            ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+        //        clocktxtblock.Text = _currentTime;
+        //    }
+        //}
+
+
+        private void StartBtn_Click(object sender, RoutedEventArgs e)
+        {
+            sw.Start();
+            dt.Start();
+            _rfidManager.Start();
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            adapter = new Adapter();
-            if(adapter.OpenConnection())
-            {
-                adapter.BeginReading();    
-            }
+           
+           
 
             Class1 cl = new Class1();
             cl.add();
@@ -46,7 +80,8 @@ namespace RaceTimer.App
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            adapter.CloseConnection();
+           
+
         }
     }
 }

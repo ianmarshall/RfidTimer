@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 
 namespace RaceTimer.Data
 {
@@ -33,9 +34,11 @@ namespace RaceTimer.Data
         public InventorySearchMode InventorySearchMode { get; set; }
     }
 
-    public class Tag
+    public class Tag : EventArgs
     {
         public int Id { get; set; }
         public string TagId { get; set; }
+        public DateTime Time { get; set; }
+        public string Rssi { get; set; }
     }
 }

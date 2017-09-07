@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{078A3161-9608-4FFD-B6E4-6310A572FEAD}</ProjectGuid>
+    <ProjectGuid>{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RaceTimer.Device.IntegratedReaderR2000</RootNamespace>
-    <AssemblyName>RaceTimer.Device.IntegratedReaderR2000</AssemblyName>
+    <RootNamespace>RaceTimer.Common</RootNamespace>
+    <AssemblyName>RaceTimer.Common</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,36 +30,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="UHFReader188CSharp">
-      <HintPath>..\..\..\..\RFID\R2000 integrated Reader_16072514540875\R2000 integrated Reader\SDK\C#\UHFReader188CSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IntegratedReaderR2000Adapter.cs" />
+    <Compile Include="IDeviceAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Basic.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RaceTimer.Common\RaceTimer.Common.csproj">
-      <Project>{5a5b02be-d2aa-418d-b4a5-3dec11b7e705}</Project>
-      <Name>RaceTimer.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RaceTimer.Data\RaceTimer.Data.csproj">
-      <Project>{76892c81-bd30-4233-b2a9-d9ddb20da23c}</Project>
+      <Project>{76892C81-BD30-4233-B2A9-D9DDB20DA23C}</Project>
       <Name>RaceTimer.Data</Name>
     </ProjectReference>
   </ItemGroup>

@@ -30,18 +30,38 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RFIDManager.cs" />
+    <Compile Include="TimerTextBlock.cs" />
     <Compile Include="ViewModel\SplitItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RaceTimer.Common\RaceTimer.Common.csproj">
+      <Project>{5a5b02be-d2aa-418d-b4a5-3dec11b7e705}</Project>
+      <Name>RaceTimer.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RaceTimer.Data\RaceTimer.Data.csproj">
+      <Project>{76892C81-BD30-4233-B2A9-D9DDB20DA23C}</Project>
+      <Name>RaceTimer.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RaceTimer.Device.IntegratedReaderR2000\RaceTimer.Device.IntegratedReaderR2000.csproj">
+      <Project>{078a3161-9608-4ffd-b6e4-6310a572fead}</Project>
+      <Name>RaceTimer.Device.IntegratedReaderR2000</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

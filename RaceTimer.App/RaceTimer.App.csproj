@@ -75,14 +75,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AppBootstrapper.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="Views\SplitsViewModel.cs" />
-    <Compile Include="Views\MainView.xaml.cs">
-      <DependentUpon>MainView.xaml</DependentUpon>
+    <Compile Include="ViewModels\SplitItem.cs" />
+    <Compile Include="ViewModels\SplitsViewModel.cs" />
+    <Compile Include="Views\AthletesView.xaml.cs">
+      <DependentUpon>AthletesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SplitsView.xaml.cs">
-      <DependentUpon>SplitsView.xaml</DependentUpon>
+    <Compile Include="Views\DeviceView.xaml.cs">
+      <DependentUpon>DeviceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RaceView.xaml.cs">
+      <DependentUpon>RaceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ReadersView.xaml.cs">
+      <DependentUpon>ReadersView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -96,11 +101,19 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\MainView.xaml">
+    <Page Include="Views\AthletesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SplitsView.xaml">
+    <Page Include="Views\DeviceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RaceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ReadersView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -134,13 +147,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RaceTimer.Business\RaceTimer.Business.csproj">
+      <Project>{fca07cc2-5a43-4c1d-8a05-e9e21348fb3e}</Project>
+      <Name>RaceTimer.Business</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RaceTimer.Data\RaceTimer.Data.csproj">
       <Project>{76892c81-bd30-4233-b2a9-d9ddb20da23c}</Project>
       <Name>RaceTimer.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RaceTimer.Device.IntegratedReaderR2000\RaceTimer.Device.IntegratedReaderR2000.csproj">
-      <Project>{078a3161-9608-4ffd-b6e4-6310a572fead}</Project>
-      <Name>RaceTimer.Device.IntegratedReaderR2000</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -148,9 +161,13 @@
       <Link>RaceTimer.sdf</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="bin\Debug\Basic.dll">
+    <Content Include="..\RaceTimer.Device.IntegratedReaderR2000\Basic.dll">
+      <Link>Basic.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

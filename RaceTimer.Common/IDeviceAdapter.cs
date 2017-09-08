@@ -5,6 +5,7 @@ namespace RaceTimer.Common
 {
     public interface IDeviceAdapter
     {
+        void Setup(ReaderProfile readerProfile);
         void BeginReading();
         bool CloseConnection();
         bool OpenConnection();

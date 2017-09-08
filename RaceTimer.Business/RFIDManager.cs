@@ -7,34 +7,54 @@ using RaceTimer.Business.ViewModel;
 using RaceTimer.Common;
 using RaceTimer.Data;
 using RaceTimer.Device.IntegratedReaderR2000;
+using RfidTimer.Device.ChaFonFourChannelR2000;
 
 namespace RaceTimer.Business
 {
-    public class RfidManager
+    public static class RfidManager
     {
         //lock object for synchronization;
+        private static IEnumerable<ReaderProfile> _readerProfiles;
         private static object _syncLock = new object();
-        private IList<IDeviceAdapter> _deviceAdapters;
-        private DateTime _raceTime;
-        private DateTime _startTime;
+        private static IList<IDeviceAdapter> _deviceAdapters;
+        private static DateTime _raceTime;
+        private static DateTime _startTime;
+        private static Dictionary<ReaderModel, IDeviceAdapter> _deviceStrategies =
+            new Dictionary<ReaderModel, IDeviceAdapter>();
+        
+        public static ObservableCollection<AthleteSplit> AthleteSplits;
 
-        public ObservableCollection<AthleteSplit> AthleteSplits;
-
-        public RfidManager()
+         static RfidManager()
         {
+            _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
+            _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
+           
+
             AthleteSplits = new ObservableCollection<AthleteSplit>();
             //Enable the cross acces to this collection elsewhere
             BindingOperations.EnableCollectionSynchronization(AthleteSplits, _syncLock);
         }
 
-        public void SetUp(DateTime raceTime)
+        public static void SetUp(IEnumerable<ReaderProfile> readerProfiles)
         {
-            _raceTime = raceTime;
-            
-            _deviceAdapters = new List<IDeviceAdapter>();
+            _readerProfiles = readerProfiles;
+            //_deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
+            //_deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
 
-            _deviceAdapters.Add(new IntegratedReaderR2000Adapter());
-            
+
+            //AthleteSplits = new ObservableCollection<AthleteSplit>();
+            ////Enable the cross acces to this collection elsewhere
+            //BindingOperations.EnableCollectionSynchronization(AthleteSplits, _syncLock);
+         //   _raceTime = raceTime;
+            foreach (var readerProfile in _readerProfiles)
+            {
+                var device = _deviceStrategies[readerProfile.Model];
+                device.Setup(readerProfile);
+
+                device.OnRecordTag += onRecordTag;
+                device.OpenConnection();
+            }
+
         
 
             AthleteSplits.Add(new AthleteSplit
@@ -42,32 +62,36 @@ namespace RaceTimer.Business
                 TagId = 1,
             });
 
-            foreach (var device in _deviceAdapters)
-            {
-                device.OnRecordTag += onRecordTag;
-                device.OpenConnection();
-            }
-            
         }
 
-        public void Start()
+        public static void Start()
         {
             _startTime = DateTime.Now;
-            foreach (var device in _deviceAdapters)
+            foreach (var readerProfile in _readerProfiles)
             {
+                IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
                 device.BeginReading();
             }
         }
 
-        public void Stop()
+        public static void Stop()
         {
-            foreach (var device in _deviceAdapters)
+            foreach (var readerProfile in _readerProfiles)
             {
+                IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
                 device.StopReading();
             }
         }
 
-        private void onRecordTag(object sender, EventArgs e)
+        public static bool Test(ReaderProfile readerProfile)
+        {
+            IDeviceAdapter reader = _deviceStrategies[readerProfile.Model];
+            reader.Setup(readerProfile);
+
+            return reader.OpenConnection() && reader.CloseConnection();
+        }
+
+        private static void onRecordTag(object sender, EventArgs e)
         {
             var tag = (Tag) e;
 
@@ -82,7 +106,8 @@ namespace RaceTimer.Business
                         Epc= tag.TagId,
                         Time = tag.Time.ToUniversalTime(),
                         SplitTime = tag.Time.Subtract(_startTime.TimeOfDay).ToString("HH:mm:ss:ff"),
-                        Rssi = tag.Rssi
+                        Rssi = tag.Rssi,
+                        SplitName = tag.SplitName
                     });
                 }
             });

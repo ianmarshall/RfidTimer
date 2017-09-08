@@ -4,21 +4,23 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:RaceTimer.App.Views" 
-        Title="Race Timer" Height="650" Width="925" 
+        Title="Race Timer" Height="650" Width="1200" 
         Closing="Window_Closing">
-    <Grid>
-        <TabControl>
-            <TabItem Header="Readers">
-                <views:ReadersView />
-            </TabItem>
-            <TabItem Header="Atheletes" />
-            <TabItem Header="" >
-                <views:RaceView />
-            </TabItem>
-                     
-        </TabControl>
-        <!--<TextBlock FontSize="50" Margin="200,-12,175,258" RenderTransformOrigin="1.443,0.195">Timer</TextBlock>
+    <ScrollViewer >
+        <Grid>
+            <TabControl>
+                <TabItem Header="Readers">
+                    <views:ReadersView/>
+                </TabItem>
+                <TabItem Header="Atheletes" />
+                <TabItem Header="Race" >
+                    <views:RaceView />
+                </TabItem>
+
+            </TabControl>
+            <!--<TextBlock FontSize="50" Margin="200,-12,175,258" RenderTransformOrigin="1.443,0.195">Timer</TextBlock>
         <TextBlock x:Name="clocktxtblock" FontSize="70" Margin="118,38,37,183"></TextBlock>
         <Button x:Name="startbtn" Margin="38,137,350,126" Background="SkyBlue" Content="Start" FontSize="30" Click="StartBtn_Click" ></Button>-->
-    </Grid>
+        </Grid>
+    </ScrollViewer>
 </Window>

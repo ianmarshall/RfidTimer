@@ -7,11 +7,7 @@
              xmlns:business="clr-namespace:RaceTimer.Business;assembly=RaceTimer.Business"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="900">
-    <!--<Grid>
-        <TextBlock FontSize="50" Margin="200,-12,175,258" RenderTransformOrigin="1.443,0.195">Timer</TextBlock>
-        <TextBlock x:Name="clocktxtblock" FontSize="70" Margin="118,38,37,183"></TextBlock>
-        <Button x:Name="startbtn" Margin="38,137,350,126" Background="SkyBlue" Content="Start" FontSize="30" Click="StartBtn_Click" ></Button>
-    </Grid>-->
+  
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -26,22 +22,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!--<TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="10,5" Text="Count Down Timer:" />
-    <Border Grid.Row="1" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" CornerRadius="8" HorizontalAlignment="Center" Background="LightGray" Margin="5">
-        <business:TimerTextBlock x:Name="ttbCountDown" IsCountDown="True" TimeSpan="00:00:59" IsStarted="True" Width="180" HorizontalAlignment="Center" TextAlignment="Center" FontSize="24" Padding="10" OnCountDownComplete="ttbCountDown_OnCountDownComplete" />
-    </Border>
-
-    <StackPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="5">
-        <Button Name="btnSet" Content="Set" Width="40" Margin="3" Click="btnSet_Click" />
-        <Button Name="btnStart" Content="Start" Width="40" Margin="3" Click="btnStart_Click" />
-        <Button Name="btnStop" Content="Stop" Width="40" Margin="3" Click="btnStop_Click" IsEnabled="{Binding Source=ttbCountDown, Path=IsStarted}" />
-        <Button Name="btnReset" Content="Reset" Width="40" Margin="3" Click="btnReset_Click" />
-    </StackPanel>-->
-
-        <!--<TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="10,5" Text="Timer:" />
-        <Border Grid.Row="3" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" CornerRadius="8" HorizontalAlignment="Center" Background="LightGray" Margin="5">
-            <business:TimerTextBlock x:Name="ttbTimer" IsStarted="True" Width="180" HorizontalAlignment="Center" TextAlignment="Center" FontSize="24" Padding="10" />
-        </Border>-->
+       
 
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="5">
             <Button Name="btnSetTimer" Content="Set" Width="40" Margin="3" Click="btnSetTimer_Click" />

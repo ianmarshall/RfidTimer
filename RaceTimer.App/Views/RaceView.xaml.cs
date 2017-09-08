@@ -30,9 +30,11 @@ namespace RaceTimer.App.Views
 
         private DispatcherTimer _timer;
         private TimeSpan Duration;
-        private RfidManager _rfidManager;
+      
         private DateTime _dateTime;
         private DateTime _raceTime;
+
+      
 
         public RaceView()
         {
@@ -45,12 +47,12 @@ namespace RaceTimer.App.Views
 
             this.Show.Text = _raceTime.ToString("HH:mm:ss:ff");
 
-            _rfidManager = new RfidManager();
+         
           
 
-            _rfidManager.SetUp(_raceTime);
+           
 
-            dgSplits.ItemsSource = _rfidManager.AthleteSplits;
+            dgSplits.ItemsSource = RfidManager.AthleteSplits;
 
         }
 
@@ -78,7 +80,8 @@ namespace RaceTimer.App.Views
 
         private void btnStartTimer_Click(object sender, RoutedEventArgs e)
         {
-            _rfidManager.Start();
+           
+           RfidManager.Start();
             _dateTime = DateTime.Now;
             _timer.Start();
             //  ttbTimer.IsStarted = true;
@@ -87,7 +90,7 @@ namespace RaceTimer.App.Views
         private void btnStopTimer_Click(object sender, RoutedEventArgs e)
         {
             // ttbTimer.IsStarted = false;
-            _rfidManager.Stop();
+            RfidManager.Stop();
             _timer.Stop();
 
         }

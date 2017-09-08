@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using RaceTimer.App.Views;
 using RaceTimer.Business;
 using RaceTimer.Data;
 
@@ -31,8 +32,7 @@ namespace RaceTimer.App
         public MainWindow()
         {
             InitializeComponent();
-          
-            _rfidManager = new RfidManager();
+        
 
 
         }
@@ -44,7 +44,7 @@ namespace RaceTimer.App
         Stopwatch sw = new Stopwatch();
         string _currentTime = string.Empty;
 
-        private RfidManager _rfidManager;
+     
 
 
 
@@ -66,7 +66,7 @@ namespace RaceTimer.App
         {
             sw.Start();
             dt.Start();
-            _rfidManager.Start();
+            RfidManager.Start();
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
@@ -74,8 +74,7 @@ namespace RaceTimer.App
            
            
 
-            Class1 cl = new Class1();
-            cl.add();
+           
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

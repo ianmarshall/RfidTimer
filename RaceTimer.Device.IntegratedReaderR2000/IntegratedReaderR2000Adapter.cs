@@ -23,9 +23,9 @@ namespace RaceTimer.Device.IntegratedReaderR2000
         private bool isInventoryScan = false;
         private int openedPort;
         private byte fComAdr = 0xff;
-        private TagRepo _tagRepo;
+        private TagRepository _tagRepo;
         private DateTime _raceTime;
-
+        private ReaderProfile _readerProfile;
 
 
         private static System.Timers.Timer aTimer;
@@ -33,13 +33,20 @@ namespace RaceTimer.Device.IntegratedReaderR2000
         public IntegratedReaderR2000Adapter()
         {
             //   _raceTime = raceTime;
-            _tagRepo = new TagRepo();
+            _tagRepo = new TagRepository();
         }
 
         ~IntegratedReaderR2000Adapter()  // destructor
         {
             CloseConnection();
         }
+
+        public void Setup(ReaderProfile readerProfile)
+        {
+            _readerProfile = readerProfile;
+           
+        }
+
 
         public bool OpenConnection()
         {
@@ -93,6 +100,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             return false;
         }
 
+        
         public void BeginReading()
         {
             // Create a timer with a two second interval.
@@ -156,7 +164,9 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                     {
                         Time = DateTime.Now,
                         TagId = sEPC,
-                        Rssi = Convert.ToInt32(RSSI, 16).ToString()
+                        Rssi = Convert.ToInt32(RSSI, 16).ToString(),
+                        SplitName = _readerProfile.Name
+                        
                     };
                     onRecordTag(tag);
                 }

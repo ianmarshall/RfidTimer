@@ -50,6 +50,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
@@ -80,9 +81,6 @@
     <Compile Include="Views\AthletesView.xaml.cs">
       <DependentUpon>AthletesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\DeviceView.xaml.cs">
-      <DependentUpon>DeviceView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\RaceView.xaml.cs">
       <DependentUpon>RaceView.xaml</DependentUpon>
     </Compile>
@@ -102,10 +100,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\AthletesView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DeviceView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

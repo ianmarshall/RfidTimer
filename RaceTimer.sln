@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.Device.Integrated
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.Common", "RaceTimer.Common\RaceTimer.Common.csproj", "{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfidTimer.Device.ChaFonFourChannelR2000", "RfidTimer.Device.ChaFonFourChannelR2000\RfidTimer.Device.ChaFonFourChannelR2000.csproj", "{93EF6C96-6158-468D-90ED-291ADD443FA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93EF6C96-6158-468D-90ED-291ADD443FA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93EF6C96-6158-468D-90ED-291ADD443FA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93EF6C96-6158-468D-90ED-291ADD443FA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93EF6C96-6158-468D-90ED-291ADD443FA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

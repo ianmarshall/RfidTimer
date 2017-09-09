@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using RaceTimer.Business.ViewModel;
@@ -21,10 +23,11 @@ namespace RaceTimer.Business
         private static DateTime _startTime;
         private static Dictionary<ReaderModel, IDeviceAdapter> _deviceStrategies =
             new Dictionary<ReaderModel, IDeviceAdapter>();
-        
-        public static ObservableCollection<AthleteSplit> AthleteSplits;
 
-         static RfidManager()
+     
+        public static ObservableCollection<AthleteSplit> AthleteSplits;
+        
+        static RfidManager()
         {
             _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
             _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
@@ -46,6 +49,7 @@ namespace RaceTimer.Business
             ////Enable the cross acces to this collection elsewhere
             //BindingOperations.EnableCollectionSynchronization(AthleteSplits, _syncLock);
          //   _raceTime = raceTime;
+
             foreach (var readerProfile in _readerProfiles)
             {
                 var device = _deviceStrategies[readerProfile.Model];
@@ -55,12 +59,12 @@ namespace RaceTimer.Business
                 device.OpenConnection();
             }
 
-        
-
             AthleteSplits.Add(new AthleteSplit
             {
                 TagId = 1,
             });
+
+         
 
         }
 
@@ -100,7 +104,7 @@ namespace RaceTimer.Business
                 lock (_syncLock)
                 {
                    
-                    AthleteSplits.Add(new AthleteSplit
+                    AthleteSplits.Insert(0, new AthleteSplit
                     {
 
                         Epc= tag.TagId,

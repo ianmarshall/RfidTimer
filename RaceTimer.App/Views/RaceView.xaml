@@ -34,7 +34,7 @@
         <Border Grid.Row="2" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" CornerRadius="8" HorizontalAlignment="Center" Background="LightGray" Margin="5">
             <TextBox Name="Show"  Width="380" HorizontalAlignment="Center" TextAlignment="Center" FontSize="24" Padding="10" />
         </Border>
-        <DataGrid Grid.Row="3" Grid.Column="1" Name="dgSplits"  HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
+        <DataGrid Grid.Row="3" Grid.Column="1" Name="dgSplits" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700">
             <!--<DataGrid.Columns>
                 <DataGridTextColumn SortMemberPath="SplitTime" SortDirection="Descending" />

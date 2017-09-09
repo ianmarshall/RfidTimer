@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseRepository.cs" />
+    <Compile Include="AthleteRepository.cs" />
     <Compile Include="ReaderProfileRepository.cs" />
     <Compile Include="DeviceProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

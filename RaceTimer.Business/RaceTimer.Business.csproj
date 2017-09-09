@@ -48,6 +48,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ObservableStack.cs" />
     <Compile Include="RFIDManager.cs" />
     <Compile Include="TimerTextBlock.cs" />
     <Compile Include="ViewModel\SplitItem.cs" />

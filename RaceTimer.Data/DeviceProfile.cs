@@ -15,6 +15,7 @@ namespace RaceTimer.Data
         }
         public DbSet<ReaderProfile> ReaderProfiles { get; set; }
         public DbSet<Tag> Tags { get; set; }
+        public DbSet<Athlete> Athletes { get; set; }
     }
 
 

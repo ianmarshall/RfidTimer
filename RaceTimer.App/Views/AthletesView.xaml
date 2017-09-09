@@ -7,6 +7,30 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal">
+            <Label Content="Assign RFID Tags"></Label>
+            <TextBox Name="tbBib" Width="40"></TextBox>
+            <TextBlock Name="tbTagId"></TextBlock>
             
+        </StackPanel>
+        
+        <DataGrid Grid.Row="2" Grid.Column="1" Name="dgAthletes" HorizontalAlignment="Center" Margin="20"  RowEditEnding="dgAthletes_RowEditEnding" 
+                  RowHeight="25">
+            
+        </DataGrid>
+        
+        
     </Grid>
 </UserControl>

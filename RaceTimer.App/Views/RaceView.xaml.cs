@@ -1,19 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using RaceTimer.Business;
 
@@ -28,14 +15,14 @@ namespace RaceTimer.App.Views
         private static event EventHandler OnTick;
 
 
-        private DispatcherTimer _timer;
-        private TimeSpan Duration;
-      
+        private readonly DispatcherTimer _timer;
+        private TimeSpan _duration;
+
         private DateTime _dateTime;
         private DateTime _raceTime;
 
-      
 
+     
         public RaceView()
         {
             InitializeComponent();
@@ -47,20 +34,18 @@ namespace RaceTimer.App.Views
 
             this.Show.Text = _raceTime.ToString("HH:mm:ss:ff");
 
-         
-          
-
-           
 
             dgSplits.ItemsSource = RfidManager.AthleteSplits;
+
+        
 
         }
 
         private void TimerOnTick(object sender, object o)
         {
-            Duration = Duration.Add(_timer.Interval);
-          //  dgSplits.ItemsSource = _rfidManager.AthleteSplits;
-           
+            _duration = _duration.Add(_timer.Interval);
+         
+
 
             _raceTime = DateTime.Now.Add(-_dateTime.TimeOfDay);
 
@@ -80,8 +65,8 @@ namespace RaceTimer.App.Views
 
         private void btnStartTimer_Click(object sender, RoutedEventArgs e)
         {
-           
-           RfidManager.Start();
+
+            RfidManager.Start();
             _dateTime = DateTime.Now;
             _timer.Start();
             //  ttbTimer.IsStarted = true;
@@ -112,35 +97,6 @@ namespace RaceTimer.App.Views
 
 
 
-        //private static void UpdateTimer(object state)
-        //{
-        //    OnTick?.Invoke(null, EventArgs.Empty);
-        //}
-
-
-
-
-
-        //void dt_Tick(object sender, EventArgs e)
-        //{
-        //    _rfidManager.SetUp();
-
-        //    if (sw.IsRunning)
-        //    {
-        //        TimeSpan ts = sw.Elapsed;
-        //        _currentTime = String.Format("{0:00}:{1:00}:{2:00}",
-        //            ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-        //        clocktxtblock.Text = _currentTime;
-        //    }
-        //}
-
-
-        //private void StartBtn_Click(object sender, RoutedEventArgs e)
-        //{
-        //    sw.Start();
-        //    dt.Start();
-        //    _rfidManager.Start();
-        //}
-
+     
     }
 }

@@ -35,8 +35,8 @@
             <!-- specify the template used to render each item -->
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <GroupBox Header="{Binding Id}" HeaderStringFormat="{}Reader {0}" Margin="10" Padding="10">
-                        <Grid HorizontalAlignment="Left" Height="226" VerticalAlignment="Top"
+                    <GroupBox Header="{Binding Id}" HeaderStringFormat="{}Reader {0}" Margin="5" Padding="10">
+                        <Grid HorizontalAlignment="Left" VerticalAlignment="Top"
                               Width="253" Margin="0,0,-2,-12">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="30" />
@@ -58,7 +58,15 @@
                                        HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <RadioButton GroupName="FreqBand" Content="EU" IsChecked="True"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <RadioButton GroupName="FreqBand" Content="US" HorizontalAlignment="Left" VerticalAlignment="Top" />
-
+                                <Label Content="Ignore tag for detects for">
+                                    
+                                </Label>
+                                <ComboBox Width="40">
+                                    <ComboBoxItem>0</ComboBoxItem>
+                                    <ComboBoxItem>5</ComboBoxItem>
+                                    <ComboBoxItem>30</ComboBoxItem>
+                                    <ComboBoxItem>90</ComboBoxItem>
+                                </ComboBox>
                             </StackPanel>
                             <StackPanel Grid.Row="3" Orientation="Horizontal">
                                 <Button Margin="2" Height="30" Width="70" Content="Save" Tag="{Binding}" Click="Button_Click_Save" ></Button>

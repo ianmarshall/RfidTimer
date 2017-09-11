@@ -3,7 +3,7 @@ using System.Data.Entity;
 
 namespace RaceTimer.Data
 {
-    public class TagRepository : BaseRepository<RaceTimerContext, Tag>
+    public class SplitRepository : BaseRepository<RaceTimerContext, Split>
     {
 
     }

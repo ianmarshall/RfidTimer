@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using RaceTimer.Business.ViewModel;
 using RaceTimer.Common;
@@ -13,81 +15,134 @@ using RfidTimer.Device.ChaFonFourChannelR2000;
 
 namespace RaceTimer.Business
 {
-    public static class RfidManager
+    public class RfidManager : INotifyPropertyChanged
     {
         //lock object for synchronization;
-        private static IEnumerable<ReaderProfile> _readerProfiles;
-        private static object _syncLock = new object();
-        private static IList<IDeviceAdapter> _deviceAdapters;
-        private static DateTime _raceTime;
-        private static DateTime _startTime;
-        private static Dictionary<ReaderModel, IDeviceAdapter> _deviceStrategies =
-            new Dictionary<ReaderModel, IDeviceAdapter>();
 
-     
-        public static ObservableCollection<AthleteSplit> AthleteSplits;
-        
-        static RfidManager()
+        private IEnumerable<ReaderProfile> _readerProfiles;
+        private readonly object _syncLock = new object();
+        private bool _connected;
+        private bool _isReading;
+        private int _nextBib;
+        private readonly Dictionary<ReaderModel, IDeviceAdapter> _deviceStrategies =
+            new Dictionary<ReaderModel, IDeviceAdapter>();
+        private Race _race;
+
+        private readonly SplitRepository _splitRepository = new SplitRepository();
+        private readonly AthleteRepository _athleteRepository = new AthleteRepository();
+        private ObservableCollection<Athlete> _athletes;
+
+        public ObservableCollection<AthleteSplit> AthleteSplits;
+
+        public RfidManager()
         {
             _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
             _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
-           
 
             AthleteSplits = new ObservableCollection<AthleteSplit>();
             //Enable the cross acces to this collection elsewhere
             BindingOperations.EnableCollectionSynchronization(AthleteSplits, _syncLock);
         }
 
-        public static void SetUp(IEnumerable<ReaderProfile> readerProfiles)
+        public bool Connected
+        {
+            get { return _connected; }
+            set
+            {
+                if (_connected != value)
+                {
+                    _connected = value;
+                    OnPropertyChanged("Connected");
+                }
+            }
+        }
+
+        public bool IsReading
+        {
+            get { return _isReading; }
+            set
+            {
+                if (_isReading != value)
+                {
+                    _isReading = value;
+                    OnPropertyChanged("IsReading");
+                }
+            }
+        }
+
+        public int NextBib
+        {
+            get { return _nextBib; }
+            set
+            {
+                if (_nextBib != value)
+                {
+                    _nextBib = value;
+                    OnPropertyChanged("NextBib");
+                }
+            }
+        }
+
+        public void SetUp(IEnumerable<ReaderProfile> readerProfiles)
         {
             _readerProfiles = readerProfiles;
-            //_deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
-            //_deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
-
-
-            //AthleteSplits = new ObservableCollection<AthleteSplit>();
-            ////Enable the cross acces to this collection elsewhere
-            //BindingOperations.EnableCollectionSynchronization(AthleteSplits, _syncLock);
-         //   _raceTime = raceTime;
 
             foreach (var readerProfile in _readerProfiles)
             {
                 var device = _deviceStrategies[readerProfile.Model];
                 device.Setup(readerProfile);
 
-                device.OnRecordTag += onRecordTag;
-                device.OpenConnection();
+                device.OnRecordTag += OnRecordTag;
+                Connected = device.OpenConnection();
             }
-
-            AthleteSplits.Add(new AthleteSplit
-            {
-                TagId = 1,
-            });
-
-         
-
         }
 
-        public static void Start()
+        public void ClearSplits()
         {
-            _startTime = DateTime.Now;
+            AthleteSplits.Clear();
+        }
+
+        public void Start(Race race)
+        {
+            _race = race;
+
             foreach (var readerProfile in _readerProfiles)
             {
                 IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
-                device.BeginReading();
+                IsReading = device.BeginReading();
             }
         }
 
-        public static void Stop()
+        public void StartAssigning(ObservableCollection<Athlete> athletes)
+        {
+            _athletes = athletes;
+            foreach (var readerProfile in _readerProfiles)
+            {
+                IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
+                IsReading = device.BeginReading();
+            }
+        }
+
+        public void Stop()
         {
             foreach (var readerProfile in _readerProfiles)
             {
                 IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
-                device.StopReading();
+                IsReading = !device.StopReading();
             }
         }
 
-        public static bool Test(ReaderProfile readerProfile)
+        public bool CloseAll()
+        {
+            foreach (var readerProfile in _readerProfiles)
+            {
+                IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
+                Connected = !device.CloseConnection();
+            }
+            return !Connected;
+        }
+
+        public bool Test(ReaderProfile readerProfile)
         {
             IDeviceAdapter reader = _deviceStrategies[readerProfile.Model];
             reader.Setup(readerProfile);
@@ -95,26 +150,126 @@ namespace RaceTimer.Business
             return reader.OpenConnection() && reader.CloseConnection();
         }
 
-        private static void onRecordTag(object sender, EventArgs e)
+        private void OnRecordTag(object sender, EventArgs e)
         {
-            var tag = (Tag) e;
+            Split split = (Split)e;
 
             Task.Factory.StartNew(() =>
             {
                 lock (_syncLock)
                 {
-                   
-                    AthleteSplits.Insert(0, new AthleteSplit
+                    if (_readerProfiles.All(x => x.ReadingMode == ReadingMode.Desktop))
                     {
+                        AssignTag(split);
+                        return;
+                    }
 
-                        Epc= tag.TagId,
-                        Time = tag.Time.ToUniversalTime(),
-                        SplitTime = tag.Time.Subtract(_startTime.TimeOfDay).ToString("HH:mm:ss:ff"),
-                        Rssi = tag.Rssi,
-                        SplitName = tag.SplitName
-                    });
+                    RecordSplit(split);
                 }
             });
+        }
+
+        private void RecordSplit(Split split)
+        {
+            split.SplitTime = split.DateTimeOfDay.Subtract(_race.StartDateTime.TimeOfDay)
+                .ToString("HH:mm:ss:ff");
+            split.RaceId = _race.Id;
+
+            AthleteSplits.Insert(0, new AthleteSplit
+            {
+                AtheleteName = "",
+                Epc = split.Epc,
+                Time = split.DateTimeOfDay,
+                SplitTime = split.DateTimeOfDay.Subtract(_race.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff"),
+                Rssi = split.Rssi,
+                SplitName = split.SplitName,
+            });
+            _splitRepository.Add(split);
+            _splitRepository.Save();
+        }
+
+        private void AssignTag(Split split)
+        {
+            Athlete nextAthlete;
+
+
+            var all = _athletes;
+                //_athleteRepository.GetAll();
+
+            if (all.Any())
+            {
+                if (all.Any(x => x.TagId == split.Epc))
+                {
+                    //prevent duplicates
+                    return;
+                }
+
+                int maxBib = all.Max(x => x.Bib);
+
+                NextBib = ++maxBib;
+
+                nextAthlete = all.SingleOrDefault(x => x.Bib == NextBib && string.IsNullOrEmpty(x.TagId));
+                if (nextAthlete != null)
+                {
+                    nextAthlete.TagId = split.Epc;
+                    _athleteRepository.Edit(nextAthlete, nextAthlete.Id);
+                    _athleteRepository.Save();
+                }
+                else
+                {
+                    nextAthlete = all.FirstOrDefault(x => x.Bib == 0);
+                    if (nextAthlete != null)
+                    {
+                        nextAthlete.Bib = NextBib;
+                        nextAthlete.TagId = split.Epc;
+                        _athleteRepository.Edit(nextAthlete, nextAthlete.Id);
+                        _athleteRepository.Save();
+                    }
+                    else
+                    {
+                        nextAthlete = new Athlete
+                        {
+                            Bib = NextBib,
+                            TagId = split.Epc
+                        };
+                        _athleteRepository.Add(nextAthlete);
+                        _athleteRepository.Save();
+
+                        Application.Current.Dispatcher.Invoke((Action) (() =>
+                        {
+                            _athletes.Insert(0, nextAthlete);
+                        }));
+                    }
+                }
+            }
+            else
+            {
+                nextAthlete = new Athlete
+                {
+                    Bib = 1,
+                    TagId = split.Epc
+                };
+                _athleteRepository.Add(nextAthlete);
+                _athleteRepository.Save();
+                Application.Current.Dispatcher.Invoke((Action)(() =>
+                {
+                    _athletes.Insert(0, nextAthlete);
+                }));
+            }
+        
+
+       
+
+            return;
+        }
+
+        
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

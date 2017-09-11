@@ -71,7 +71,12 @@ namespace RaceTimer.Data
 
         public virtual void Save()
         {
-            _entities.SaveChanges();
+            //using (DbContextTransaction dbTran = _entities.Database.BeginTransaction())
+            //{
+                _entities.SaveChanges();
+                //commit transaction
+            //    dbTran.Commit();
+            //}
         }
 
         public bool IsDirty()

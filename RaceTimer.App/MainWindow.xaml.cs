@@ -26,56 +26,14 @@ namespace RaceTimer.App
     /// </summary>
     public partial class MainWindow : Window
     {
-
-    
+        public RfidManager RfidManager { get; set; }
 
         public MainWindow()
         {
+            RfidManager = new RfidManager();
             InitializeComponent();
-        
-
-
         }
 
-
-     
-
-        DispatcherTimer dt = new DispatcherTimer();
-        Stopwatch sw = new Stopwatch();
-        string _currentTime = string.Empty;
-
-     
-
-
-
-        //void dt_Tick(object sender, EventArgs e)
-        //{
-        //    _rfidManager.SetUp();
-
-        //    if (sw.IsRunning)
-        //    {
-        //        TimeSpan ts = sw.Elapsed;
-        //        _currentTime = String.Format("{0:00}:{1:00}:{2:00}",
-        //            ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-        //        clocktxtblock.Text = _currentTime;
-        //    }
-        //}
-
-
-        private void StartBtn_Click(object sender, RoutedEventArgs e)
-        {
-            sw.Start();
-            dt.Start();
-            RfidManager.Start();
-        }
-
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-           
-           
-
-           
-        }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

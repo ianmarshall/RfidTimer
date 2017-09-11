@@ -18,7 +18,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             _readerProfile = readerProfile;
         }
 
-        public void BeginReading()
+        public bool BeginReading()
         {
             throw new NotImplementedException();
         }
@@ -33,7 +33,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             return false;
         }
 
-        public void StopReading()
+        public bool StopReading()
         {
             throw new NotImplementedException();
         }

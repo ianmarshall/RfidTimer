@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using RaceTimer.Business;
+using RaceTimer.Data;
 
 namespace RaceTimer.App.Views
 {
@@ -12,42 +13,53 @@ namespace RaceTimer.App.Views
     public partial class RaceView : UserControl
     {
         //   private static Timer _updateTimer = new Timer(UpdateTimer, null, 100, 100);
-        private static event EventHandler OnTick;
-
-
-        private readonly DispatcherTimer _timer;
+        // private static event EventHandler OnTick;
+        private DispatcherTimer _timer;
         private TimeSpan _duration;
-
-        private DateTime _dateTime;
+        private DateTime _startTime;
         private DateTime _raceTime;
+        private readonly RaceRepository _raceRepository;
+        private readonly RfidManager _rfidManager;
+        private Race _race;
 
-
-     
         public RaceView()
         {
             InitializeComponent();
+
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            _rfidManager = mainWindow.RfidManager;
+
+            this.DataContext = _rfidManager;
+            //  btnSetTimer.IsEnabled = _rfidManager.Connected;
+
+            btnStartTimer.IsEnabled = false;
+            btnStopTimer.IsEnabled = false;
+
             //  ttbTimer.IsStarted = false;
-            _dateTime = DateTime.Now;
-            _timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 1), DispatcherPriority.Normal, TimerOnTick, this.Dispatcher);
-            _timer.Stop();
-            _raceTime = DateTime.Now.Add(-_dateTime.TimeOfDay);
+            _raceRepository = new RaceRepository();
 
             this.Show.Text = _raceTime.ToString("HH:mm:ss:ff");
 
+            dgSplits.ItemsSource = _rfidManager.AthleteSplits;
 
-            dgSplits.ItemsSource = RfidManager.AthleteSplits;
+            //   btnStartTimer.IsEnabled = RfidManager.Connected;
+        }
 
-        
-
+        private void SetTimer()
+        {
+            
+            _timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 1), DispatcherPriority.Normal, TimerOnTick, this.Dispatcher);
+            _timer.Stop();
+            _raceTime = DateTime.Now.Add(-_startTime.TimeOfDay);
         }
 
         private void TimerOnTick(object sender, object o)
         {
             _duration = _duration.Add(_timer.Interval);
-         
 
 
-            _raceTime = DateTime.Now.Add(-_dateTime.TimeOfDay);
+
+            _raceTime = DateTime.Now.Add(-_startTime.TimeOfDay);
 
             this.Show.Text = _raceTime.ToString("HH:mm:ss:ff"); //+ " - " + Convert.ToDateTime(Duration.ToString()).ToString("HH:mm:ss:fff");// DateTime.Now.ToString("HH:mm:ss:ff") + _dateTime;
             // this.Show.Text = String.Format("{0:D2}:{1:D2}", Duration.Seconds, Duration.Milliseconds);
@@ -56,47 +68,79 @@ namespace RaceTimer.App.Views
         }
 
 
-        private void btnSetTimer_Click(object sender, RoutedEventArgs e)
+        private void btnNewRace_Click(object sender, RoutedEventArgs e)
         {
-            //  ttbTimer.TimeSpan = TimeSpan.FromMinutes(5);
+            if (_rfidManager.IsReading)
+            {
+                return;
+            }
+            _raceTime = DateTime.MinValue;
+            this.Show.Text = _raceTime.ToString("HH:mm:ss:ff");
+            
+            _race = new Race
+            {
+                Name = rbRaceName.Text,
+                StartDateTime = DateTime.MinValue,
+            };
 
-            dgSplits.Items.Refresh();
+            
+
+            _rfidManager.ClearSplits();
+
+           
+            btnStartTimer.IsEnabled = true;
+            btnStopTimer.IsEnabled = false;
         }
 
         private void btnStartTimer_Click(object sender, RoutedEventArgs e)
         {
+            _startTime = DateTime.Now;
+            SetTimer();
+          
 
-            RfidManager.Start();
-            _dateTime = DateTime.Now;
+            _race.StartDateTime = _startTime;
+            _race.StartTime = _startTime.ToString("hh.mm.ss.ff");
+
+            _raceRepository.Add(_race);
+            _raceRepository.Save();
+            _rfidManager.Start(_race);
             _timer.Start();
-            //  ttbTimer.IsStarted = true;
+            
+            btnStartTimer.IsEnabled = false;
+            btnStopTimer.IsEnabled = true;
+
         }
 
         private void btnStopTimer_Click(object sender, RoutedEventArgs e)
         {
             // ttbTimer.IsStarted = false;
-            RfidManager.Stop();
+            _rfidManager.Stop();
             _timer.Stop();
+            _race.FinishDateTime = DateTime.Now;
+            _raceRepository.Edit(_race, _race.Id);
+            _raceRepository.Save();
+
+            btnStopTimer.IsEnabled = false;
 
         }
 
-        private void btnResetTimer_Click(object sender, RoutedEventArgs e)
-        {
-            _dateTime = DateTime.Now;
+        //private void btnResetTimer_Click(object sender, RoutedEventArgs e)
+        //{
+        //    _dateTime = DateTime.Now;
 
 
-            //_timer.Stop();
-            //_timer.Interval = new TimeSpan(0, 0, 0, 0, 1);
-            //_timer.Start();
-
-
-
-            //  Duration = new TimeSpan();
-            //   ttbTimer.Reset();
-        }
+        //    //_timer.Stop();
+        //    //_timer.Interval = new TimeSpan(0, 0, 0, 0, 1);
+        //    //_timer.Start();
 
 
 
-     
+        //    //  Duration = new TimeSpan();
+        //    //   ttbTimer.Reset();
+        //}
+
+
+
+
     }
 }

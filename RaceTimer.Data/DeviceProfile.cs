@@ -14,7 +14,7 @@ namespace RaceTimer.Data
         {
         }
         public DbSet<ReaderProfile> ReaderProfiles { get; set; }
-        public DbSet<Tag> Tags { get; set; }
+        public DbSet<Split> Tags { get; set; }
         public DbSet<Athlete> Athletes { get; set; }
     }
 
@@ -32,6 +32,13 @@ namespace RaceTimer.Data
         Session3DualTargetWithSuppression = 3,
     }
 
+    public enum ReadingMode
+    {
+        Start,
+        Finish,
+        Desktop
+    }
+
     public enum ReaderModel
     {
         ChaFonIntegratedR2000,
@@ -47,8 +54,11 @@ namespace RaceTimer.Data
         public int Id { get; set; }
         public string Name { get; set; }
         public ReaderModel Model { get; set; }
+        public ReadingMode ReadingMode { get; set; }
         [NotMapped]
         public IList<ReaderModel> Models { get; } = Enum.GetValues(typeof(ReaderModel)).Cast<ReaderModel>().ToList();
+        [NotMapped]
+        public IList<ReadingMode> ReadingModes { get; } = Enum.GetValues(typeof(ReadingMode)).Cast<ReadingMode>().ToList();
         public ConnectionType ConnectionType { get; set; }
         public InventorySearchMode InventorySearchMode { get; set; }
 
@@ -74,14 +84,5 @@ namespace RaceTimer.Data
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }
-
-    public class Tag : EventArgs
-    {
-        public int Id { get; set; }
-        public string TagId { get; set; }
-        public DateTime Time { get; set; }
-        public string Rssi { get; set; }
-        public string SplitName { get; set; }
     }
 }

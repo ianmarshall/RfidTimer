@@ -6,10 +6,10 @@ namespace RaceTimer.Common
     public interface IDeviceAdapter
     {
         void Setup(ReaderProfile readerProfile);
-        void BeginReading();
+        bool BeginReading();
         bool CloseConnection();
         bool OpenConnection();
-        void StopReading();
+        bool StopReading();
         event EventHandler<EventArgs> OnRecordTag;
     }
 }

@@ -7,7 +7,7 @@
              xmlns:business="clr-namespace:RaceTimer.Business;assembly=RaceTimer.Business"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="900">
-  
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -22,19 +22,21 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-       
 
-        <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="5">
-            <Button Name="btnSetTimer" Content="Set" Width="40" Margin="3" Click="btnSetTimer_Click" />
-            <Button Name="btnStartTimer" Content="Start" Width="40" Margin="3" Click="btnStartTimer_Click" />
-            <Button Name="btnStopTimer" Content="Stop" Width="40" Margin="3" IsEnabled="{Binding Source=ttbCountDown, Path=IsStarted}" Click="btnStopTimer_Click" />
-            <Button Name="btnResetTimer" Content="Reset" Width="40" Margin="3" Click="btnResetTimer_Click" />
+
+        <StackPanel Name="spClockButtons" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="5">
+            <Label Width="45" Height="30" Content="Name"></Label>
+            <TextBox Name="rbRaceName" Width="100" Height="20"></TextBox>
+            <Button Name="btnNewRace" IsEnabled="{Binding Connected}"  Content="New Race" Width="60" Height="30" Margin="3" Click="btnNewRace_Click" />
+            <Button Name="btnStartTimer" Content="Start" Width="45" Height="30" Margin="3" Click="btnStartTimer_Click" />
+            <Button Name="btnStopTimer" Content="Finish" Width="45" Margin="3" Height="30" IsEnabled="{Binding Source=ttbCountDown, Path=IsStarted}" Click="btnStopTimer_Click" />
+            <!--<Button Name="btnResetTimer" Content="Reset" Width="40" Margin="3" Click="btnResetTimer_Click" />-->
         </StackPanel>
-        
+
         <Border Grid.Row="2" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" CornerRadius="8" HorizontalAlignment="Center" Background="LightGray" Margin="5">
             <TextBox Name="Show"  Width="380" HorizontalAlignment="Center" TextAlignment="Center" FontSize="24" Padding="10" />
         </Border>
-        <DataGrid Grid.Row="3" Grid.Column="1" Name="dgSplits" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
+        <DataGrid Grid.Row="3" Grid.Column="1" Name="dgSplits" IsReadOnly="True" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700">
             <!--<DataGrid.Columns>
                 <DataGridTextColumn SortMemberPath="SplitTime" SortDirection="Descending" />

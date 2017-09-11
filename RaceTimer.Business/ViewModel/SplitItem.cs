@@ -4,6 +4,7 @@ namespace RaceTimer.Business.ViewModel
 {
     public class AthleteSplit
     {
+        public int Bib { get; set; }
         public string AtheleteName { get; set; }
         public int AthleteId { get; set;  }
         public string SplitName { get; set; }

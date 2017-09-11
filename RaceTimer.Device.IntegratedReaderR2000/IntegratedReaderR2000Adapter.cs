@@ -23,7 +23,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
         private bool isInventoryScan = false;
         private int openedPort;
         private byte fComAdr = 0xff;
-        private TagRepository _tagRepo;
+        private SplitRepository _tagRepo;
         private DateTime _raceTime;
         private ReaderProfile _readerProfile;
 
@@ -33,7 +33,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
         public IntegratedReaderR2000Adapter()
         {
             //   _raceTime = raceTime;
-            _tagRepo = new TagRepository();
+            _tagRepo = new SplitRepository();
         }
 
         ~IntegratedReaderR2000Adapter()  // destructor
@@ -44,7 +44,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
         public void Setup(ReaderProfile readerProfile)
         {
             _readerProfile = readerProfile;
-           
+
         }
 
 
@@ -95,13 +95,13 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             catch (Exception e)
             {
                 Console.WriteLine(e);
-               
+
             }
             return false;
         }
 
-        
-        public void BeginReading()
+
+        public bool BeginReading()
         {
             // Create a timer with a two second interval.
             aTimer = new System.Timers.Timer(100);
@@ -109,11 +109,13 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             aTimer.Elapsed += TimerTick;
             aTimer.AutoReset = true;
             aTimer.Enabled = true;
+            return true;
         }
 
-        public void StopReading()
+        public bool StopReading()
         {
-            StaticClassReaderB.CloseSpecComPort(comPortIndex);
+            aTimer.Enabled = false;
+            return true;
         }
 
         private void Inventory()
@@ -159,14 +161,15 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                     {
                         return;
                     }
+                    var readTime = DateTime.Now;
 
-                    var tag = new Tag
+                    var tag = new Split
                     {
-                        Time = DateTime.Now,
-                        TagId = sEPC,
+                        DateTimeOfDay = readTime,
+                        TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
+                        Epc = sEPC,
                         Rssi = Convert.ToInt32(RSSI, 16).ToString(),
                         SplitName = _readerProfile.Name
-                        
                     };
                     onRecordTag(tag);
                 }
@@ -178,11 +181,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
         private void onRecordTag(EventArgs e)
         {
-            EventHandler<EventArgs> handler = OnRecordTag;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
+            OnRecordTag?.Invoke(this, e);
         }
 
         public event EventHandler<EventArgs> OnRecordTag;
@@ -203,6 +202,6 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
         }
 
-        
+
     }
 }

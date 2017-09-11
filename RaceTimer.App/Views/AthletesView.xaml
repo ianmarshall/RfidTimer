@@ -20,10 +20,11 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal">
-            <Label Content="Assign RFID Tags"></Label>
-            <TextBox Name="tbBib" Width="40"></TextBox>
-            <TextBlock Name="tbTagId"></TextBlock>
-            
+            <Label Content="Assign RFID Tags" Margin="5"></Label>
+            <TextBox Name="tbBib" FontSize="14" Text="{Binding NextBib}" Width="50"></TextBox>
+            <TextBlock Name="tbTagId"  Margin="5"></TextBlock>
+            <Button Name="btnAssign" IsEnabled="{Binding Connected}" Width="60" Margin="5" Content="Assign" Click="btnAssign_Click"></Button>
+            <!--<Button Content="Assign Tags" Click="Button_Click"></Button>-->
         </StackPanel>
         
         <DataGrid Grid.Row="2" Grid.Column="1" Name="dgAthletes" HorizontalAlignment="Center" Margin="20"  RowEditEnding="dgAthletes_RowEditEnding" 

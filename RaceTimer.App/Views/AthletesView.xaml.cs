@@ -1,19 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using RaceTimer.Business.ViewModel;
+using RaceTimer.Business;
 using RaceTimer.Data;
 
 namespace RaceTimer.App.Views
@@ -24,20 +13,25 @@ namespace RaceTimer.App.Views
     /// </summary>
     public partial class AthletesView : UserControl
     {
+        private RfidManager _rfidManager;
         private AthleteRepository _athleteRepository;
 
-        public static ObservableCollection<Athlete> Athletes;
+        public ObservableCollection<Athlete> Athletes;
 
         public AthletesView()
         {
             InitializeComponent();
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            _rfidManager = mainWindow.RfidManager;
+            this.DataContext = _rfidManager;
+
             _athleteRepository = new AthleteRepository();
 
             _athleteRepository.Add(new Athlete
             {
                 FirstName = "Ian",
                 LastName = "Marshall",
-                Dob = new DateTime(1979,3, 8),
+                Dob = new DateTime(1979, 3, 8),
                 Club = "Hunts AC"
             });
 
@@ -61,6 +55,17 @@ namespace RaceTimer.App.Views
             }
             _athleteRepository.Save();
 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            AssignTags assignTags = new AssignTags();
+            assignTags.Show();
+        }
+
+        private void btnAssign_Click(object sender, RoutedEventArgs e)
+        {
+            _rfidManager.StartAssigning(Athletes);
         }
     }
 }

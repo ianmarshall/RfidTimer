@@ -23,6 +23,8 @@
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="5">
             <Button Name="btnAddReader" Padding="10" Content="Add Reader" Click="btnAddReader_Click" Margin="5" HorizontalAlignment="Center"></Button>
             <Button Name="btnEnableAllReaders" Padding="10" Content="Enable all" Margin="5" HorizontalAlignment="Center" Click="btnEnableAllReaders_Click"></Button>
+            <Button Name="btnDisableAllReaders" Padding="10" Content="Disable all" Margin="5" HorizontalAlignment="Center" Click="btnDisableAllReaders_Click"></Button>
+            <TextBlock Name="tbIsReading" Text="{Binding IsReading}"></TextBlock>
         </StackPanel>
 
         <ItemsControl Grid.Row="2" Grid.Column="1" x:Name="readers">
@@ -53,16 +55,17 @@
                                 <Label Content="Model"
                                        HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <ComboBox  SelectedValue="{Binding Model, Mode=TwoWay}" ItemsSource="{Binding Models}"/>
-                                
+                                <Label Content="Reader Mode"></Label>
+                                <ComboBox  SelectedValue="{Binding ReadingMode, Mode=TwoWay}" ItemsSource="{Binding ReadingModes}"/>
                                 <Label Content="Frequency Band"
                                        HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <RadioButton GroupName="FreqBand" Content="EU" IsChecked="True"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <RadioButton GroupName="FreqBand" Content="US" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                                <Label Content="Ignore tag for detects for">
+                                <Label Content="Ignore tag for detects for * seconds">
                                     
                                 </Label>
                                 <ComboBox Width="40">
-                                    <ComboBoxItem>0</ComboBoxItem>
+                                    <ComboBoxItem IsSelected="True">0</ComboBoxItem>
                                     <ComboBoxItem>5</ComboBoxItem>
                                     <ComboBoxItem>30</ComboBoxItem>
                                     <ComboBoxItem>90</ComboBoxItem>

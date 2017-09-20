@@ -14,7 +14,7 @@ namespace RaceTimer.Data
         {
         }
         public DbSet<ReaderProfile> ReaderProfiles { get; set; }
-        public DbSet<Split> Tags { get; set; }
+        public DbSet<Split> Splits { get; set; }
         public DbSet<Athlete> Athletes { get; set; }
     }
 
@@ -27,6 +27,7 @@ namespace RaceTimer.Data
 
     public enum InventorySearchMode
     {
+        Session0Continues = 0,
         Session1SingleTarget = 1,
         Session2DualTarget = 2,
         Session3DualTargetWithSuppression = 3,
@@ -36,7 +37,8 @@ namespace RaceTimer.Data
     {
         Start,
         Finish,
-        Desktop
+        Desktop,
+        Custom
     }
 
     public enum ReaderModel
@@ -46,10 +48,41 @@ namespace RaceTimer.Data
         MotorolaFourChannelFx7400
     }
 
-  
+    public enum ComPort
+    {
+        Auto = 0,
+        Com1 = 1,
+        Com2 = 2,
+        Com3 = 3,
+        Com4 = 4,
+        Com5 = 5,
+        Com6 = 6,
+        Com7 = 7,
+        Com8 = 8,
+        Com9 = 9,
+        Com10 = 10,
+        Com11 = 11,
+        Com12 = 12,
+    }
+
+
+    public enum StartReadDelay
+    {
+        None = 0,
+        T10s = 10,
+        T20s = 20,
+        T30s = 30,
+        T60s = 60,
+        T90s = 90,
+    }
 
     public class ReaderProfile : INotifyPropertyChanged
     {
+        public ReaderProfile()
+        {
+            PowerDbm = 30;
+        }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Name { get; set; }
@@ -60,19 +93,62 @@ namespace RaceTimer.Data
         [NotMapped]
         public IList<ReadingMode> ReadingModes { get; } = Enum.GetValues(typeof(ReadingMode)).Cast<ReadingMode>().ToList();
         public ConnectionType ConnectionType { get; set; }
-        public InventorySearchMode InventorySearchMode { get; set; }
 
-        private string _Status;
+        private InventorySearchMode _inventorySearchMode;
+
+        public InventorySearchMode InventorySearchMode
+        {
+            get { return _inventorySearchMode; }
+            set
+            {
+                if (_inventorySearchMode != value)
+                {
+                    _inventorySearchMode = value;
+                    OnPropertyChanged("InventorySearchMode");
+                }
+            }
+        }
+
+        [NotMapped]
+        public IList<InventorySearchMode> InventorySearchModes { get; } = Enum.GetValues(typeof(InventorySearchMode)).Cast<InventorySearchMode>().ToList();
+
+        public ComPort ComPort { get; set; }
+        
+        [NotMapped]
+        public IList<ComPort> ComPorts { get; } = Enum.GetValues(typeof(ComPort)).Cast<ComPort>().ToList();
+
+        public StartReadDelay StartReadDelay { get; set; }
+        [NotMapped]
+        public IList<StartReadDelay> StartReadDelays { get; } = Enum.GetValues(typeof(StartReadDelay)).Cast<StartReadDelay>().ToList();
+
+        private int _powerDbm;
+
+        public int PowerDbm
+        {
+            get { return _powerDbm; }
+            set
+            {
+                if (_powerDbm != value)
+                {
+                    _powerDbm = value;
+                    OnPropertyChanged("PowerDbm");
+                }
+            }
+        }
+        [NotMapped]
+        public IEnumerable<int> Powers { get; } = Enumerable.Range(1, 30);
+
+        private string _status;
 
         [NotMapped]
         public string Status
         {
-            get { return _Status; }
+            get { return _status; }
             set
             {
-                if (_Status != value)
+                if (_status != value)
                 {
-                    _Status = value;
+                    _status = value;
                     OnPropertyChanged("Status");
                 }
             }

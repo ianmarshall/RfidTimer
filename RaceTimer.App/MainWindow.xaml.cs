@@ -27,10 +27,15 @@ namespace RaceTimer.App
     public partial class MainWindow : Window
     {
         public RfidManager RfidManager { get; set; }
+        public AthleteManager AthleteManager { get; set; }
+        public ReportManager ReportManager { get; set; }
 
         public MainWindow()
         {
-            RfidManager = new RfidManager();
+            AthleteManager = new AthleteManager();
+            ReportManager = new ReportManager();
+            RfidManager = new RfidManager(AthleteManager);
+            
             InitializeComponent();
         }
 

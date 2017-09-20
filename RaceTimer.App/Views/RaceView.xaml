@@ -38,10 +38,31 @@
         </Border>
         <DataGrid Grid.Row="3" Grid.Column="1" Name="dgSplits" IsReadOnly="True" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="FontSize" Value="14"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SplitLapCount}" Value="23">
+                            <Setter Property="Background" Value="Orange"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding SplitLapCount}" Value="24">
+                            <Setter Property="Background" Value="Red"></Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding SplitLapCount}" Value="25">
+                            <Setter Property="Background" Value="Blue"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+
             <!--<DataGrid.Columns>
                 <DataGridTextColumn SortMemberPath="SplitTime" SortDirection="Descending" />
             </DataGrid.Columns>-->
 
         </DataGrid>
+        <ComboBox Name="cbRaces" ItemsSource="{Binding Races}" 
+                  DisplayMemberPath="Name" 
+                  SelectedValuePath="Name" 
+                  Width="120"/>
     </Grid>
 </UserControl>

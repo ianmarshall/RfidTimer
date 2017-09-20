@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -9,10 +10,17 @@ namespace RaceTimer.Data
 {
     public class AthleteRepository : BaseRepository<RaceTimerContext, Athlete>
     {
-
+        public int GetMaxBib()
+        {
+            if (_entities.Athletes.Any())
+            {
+                return _entities.Athletes.Max(x => x.Bib);
+            }
+            return 0;
+        }
     }
 
-    public class Athlete : INotifyPropertyChanged
+    public sealed class Athlete : INotifyPropertyChanged
     {
         private int _bib;
         private string _tagId;
@@ -23,7 +31,7 @@ namespace RaceTimer.Data
         }
 
         public int Id { get; set; }
-        // public int Bib { get; set; }
+        
         public int Bib
         {
             get { return _bib; }
@@ -38,7 +46,6 @@ namespace RaceTimer.Data
         }
 
         public string TagId
-
         {
             get { return _tagId; }
             set
@@ -47,25 +54,26 @@ namespace RaceTimer.Data
                     != value)
                 {
                     _tagId = value;
+                    TagAssignDateTime = DateTime.Now;
                     OnPropertyChanged("TagId");
                 }
             }
         }
 
+        public DateTime ? TagAssignDateTime { get; set; }
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        [NotMapped]
-        public DateTime Dob { get; set; }
+        public DateTime ? Dob { get; set; }
         public string Club { get; set; }
 
-        public virtual ICollection<Race> Races { get; set; }
-        public virtual ICollection<Split> Tags { get; set; }
+        public ICollection<Race> Races { get; set; }
+        public ICollection<Split> Tags { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
         }
     }
 }

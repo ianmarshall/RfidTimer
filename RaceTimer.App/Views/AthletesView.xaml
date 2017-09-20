@@ -21,13 +21,19 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal">
             <Label Content="Assign RFID Tags" Margin="5"></Label>
+            <CheckBox Name="cbAutoAssign" Click="cbAutoAssign_Click"></CheckBox>
             <TextBox Name="tbBib" FontSize="14" Text="{Binding NextBib}" Width="50"></TextBox>
-            <TextBlock Name="tbTagId"  Margin="5"></TextBlock>
-            <Button Name="btnAssign" IsEnabled="{Binding Connected}" Width="60" Margin="5" Content="Assign" Click="btnAssign_Click"></Button>
-            <!--<Button Content="Assign Tags" Click="Button_Click"></Button>-->
+
+
+            <Button Name="btnAssign" IsEnabled="{Binding Connected}" Width="60" Margin="5" Content="Start" Click="btnAssign_Click"></Button>
+            <Button Name="btnStopAssign" Width="60" Margin="5" Content="Stop" Click="btnStopAssign_Click"></Button>
+          
         </StackPanel>
         
-        <DataGrid Grid.Row="2" Grid.Column="1" Name="dgAthletes" HorizontalAlignment="Center" Margin="20"  RowEditEnding="dgAthletes_RowEditEnding" 
+        <StackPanel Grid.Row="2" Grid.Column="1">
+            <TextBlock Name="tbMessage" Text="{Binding Message}" Margin="5" Width="350"></TextBlock>
+        </StackPanel>
+        <DataGrid Grid.Row="3" Grid.Column="1" Name="dgAthletes" HorizontalAlignment="Center" Margin="20"  RowEditEnding="dgAthletes_RowEditEnding" 
                   RowHeight="25">
             
         </DataGrid>

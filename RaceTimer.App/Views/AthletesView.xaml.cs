@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using RaceTimer.Business;
@@ -7,44 +6,50 @@ using RaceTimer.Data;
 
 namespace RaceTimer.App.Views
 {
-    
     /// <summary>
     /// Interaction logic for AthletesView.xaml
     /// </summary>
     public partial class AthletesView : UserControl
     {
         private RfidManager _rfidManager;
+        private AthleteManager _athleteManager;
         private AthleteRepository _athleteRepository;
+        private bool _autoAssign;
 
-        public ObservableCollection<Athlete> Athletes;
 
         public AthletesView()
         {
             InitializeComponent();
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             _rfidManager = mainWindow.RfidManager;
-            this.DataContext = _rfidManager;
+            _athleteManager = mainWindow.AthleteManager;
+            btnStopAssign.IsEnabled = false;
+
+            this.DataContext = _athleteManager;
+
+            btnAssign.DataContext = _rfidManager;
 
             _athleteRepository = new AthleteRepository();
 
-            _athleteRepository.Add(new Athlete
-            {
-                FirstName = "Ian",
-                LastName = "Marshall",
-                Dob = new DateTime(1979, 3, 8),
-                Club = "Hunts AC"
-            });
+            //_athleteRepository.Add(new Athlete
+            //{
+            //    FirstName = "Ian",
+            //    LastName = "Marshall",
+            //    Dob = new DateTime(1979, 3, 8),
+            //    Club = "Hunts AC"
+            //});
 
             _athleteRepository.Save();
 
-            Athletes = new ObservableCollection<Athlete>(_athleteRepository.GetAll());
+            //      Athletes = new ObservableCollection<Athlete>(_athleteRepository.GetAll());
 
-            dgAthletes.ItemsSource = Athletes;
+            dgAthletes.ItemsSource = _athleteManager.Athletes;
+            //    _athleteManager.
         }
 
         private void dgAthletes_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
-            Athlete athlete = (Athlete) e.Row.Item;
+            Athlete athlete = (Athlete)e.Row.Item;
             if (athlete.Id > 0)
             {
                 _athleteRepository.Edit(athlete, athlete.Id);
@@ -65,7 +70,28 @@ namespace RaceTimer.App.Views
 
         private void btnAssign_Click(object sender, RoutedEventArgs e)
         {
-            _rfidManager.StartAssigning(Athletes);
+            btnStopAssign.IsEnabled = true;
+            _athleteManager.Message = "";
+            _rfidManager.StartAssigning();
+        }
+
+        private void cbAutoAssign_Click(object sender, RoutedEventArgs e)
+        {
+            if (cbAutoAssign.IsChecked.HasValue && cbAutoAssign.IsChecked.Value)
+            {
+                _athleteManager.AutoAssign = true;
+                _athleteManager.NextBib = _athleteRepository.GetMaxBib() + 1;
+            }
+            else
+            {
+                _athleteManager.AutoAssign = false;
+            }
+        }
+
+        private void btnStopAssign_Click(object sender, RoutedEventArgs e)
+        {
+            _rfidManager.Stop();
+            btnStopAssign.IsEnabled = false;
         }
     }
 }

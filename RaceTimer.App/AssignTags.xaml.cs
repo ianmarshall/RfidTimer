@@ -35,8 +35,8 @@ namespace RaceTimer.App
 
         private void btnAssign_Click(object sender, RoutedEventArgs e)
         {
-            int maxBib = _athleteRepository.GetAll().Max(x => x.Bib);
-                
+            int maxBib = _athleteRepository.GetMaxBib();
+
             //    OrderBy(x=>x.Bib).FirstOrDefault(x => string.IsNullOrEmpty(x.TagId));
 
 

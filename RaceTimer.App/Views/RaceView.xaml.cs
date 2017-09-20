@@ -20,6 +20,7 @@ namespace RaceTimer.App.Views
         private DateTime _raceTime;
         private readonly RaceRepository _raceRepository;
         private readonly RfidManager _rfidManager;
+        private readonly ReportManager _reportManager;
         private Race _race;
 
         public RaceView()
@@ -28,8 +29,13 @@ namespace RaceTimer.App.Views
 
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             _rfidManager = mainWindow.RfidManager;
+            _reportManager = mainWindow.ReportManager;
+
 
             this.DataContext = _rfidManager;
+            cbRaces.DataContext = _reportManager;
+            cbRaces.ItemsSource = _reportManager.Races;
+
             //  btnSetTimer.IsEnabled = _rfidManager.Connected;
 
             btnStartTimer.IsEnabled = false;
@@ -47,7 +53,6 @@ namespace RaceTimer.App.Views
 
         private void SetTimer()
         {
-            
             _timer = new DispatcherTimer(new TimeSpan(0, 0, 0, 0, 1), DispatcherPriority.Normal, TimerOnTick, this.Dispatcher);
             _timer.Stop();
             _raceTime = DateTime.Now.Add(-_startTime.TimeOfDay);
@@ -56,9 +61,6 @@ namespace RaceTimer.App.Views
         private void TimerOnTick(object sender, object o)
         {
             _duration = _duration.Add(_timer.Interval);
-
-
-
             _raceTime = DateTime.Now.Add(-_startTime.TimeOfDay);
 
             this.Show.Text = _raceTime.ToString("HH:mm:ss:ff"); //+ " - " + Convert.ToDateTime(Duration.ToString()).ToString("HH:mm:ss:fff");// DateTime.Now.ToString("HH:mm:ss:ff") + _dateTime;
@@ -83,20 +85,20 @@ namespace RaceTimer.App.Views
                 StartDateTime = DateTime.MinValue,
             };
 
-            
+            _reportManager.Races.Insert(0, _race);
 
             _rfidManager.ClearSplits();
 
-           
             btnStartTimer.IsEnabled = true;
             btnStopTimer.IsEnabled = false;
+            
+
         }
 
         private void btnStartTimer_Click(object sender, RoutedEventArgs e)
         {
             _startTime = DateTime.Now;
             SetTimer();
-          
 
             _race.StartDateTime = _startTime;
             _race.StartTime = _startTime.ToString("hh.mm.ss.ff");
@@ -138,9 +140,6 @@ namespace RaceTimer.App.Views
         //    //  Duration = new TimeSpan();
         //    //   ttbTimer.Reset();
         //}
-
-
-
 
     }
 }

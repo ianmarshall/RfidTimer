@@ -3,20 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:RaceTimer.App.Views" 
+        xmlns:views="clr-namespace:RaceTimer.App.Views"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         Title="Race Timer" Height="650" Width="1200" 
         Closing="Window_Closing">
     <ScrollViewer >
         <Grid>
             <TabControl>
-                <TabItem Header="Readers">
+                <TabItem Header="Readers" Width="100" Height="30">
                     <views:ReadersView/>
                 </TabItem>
-                <TabItem Header="Atheletes" >
+                <TabItem Header="Atheletes" Width="100" Height="30">
                     <views:AthletesView/>
                 </TabItem>
-                <TabItem Header="Race" >
+                <TabItem Header="Race" Width="100" Height="30">
                     <views:RaceView />
+                </TabItem>
+                <TabItem Header="Report" Width="100" Height="30">
+                    <views:ReportView />
                 </TabItem>
             </TabControl>
             <!--<TextBlock FontSize="50" Margin="200,-12,175,258" RenderTransformOrigin="1.443,0.195">Timer</TextBlock>

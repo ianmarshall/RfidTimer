@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text;
 
 namespace RaceTimer.Data
 {
     public class RaceRepository : BaseRepository<RaceTimerContext,Race>
     {
-       
+        
     }
 
     public class Race

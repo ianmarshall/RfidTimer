@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 using RaceTimer.Business.ViewModel;
 using RaceTimer.Common;
@@ -23,19 +22,21 @@ namespace RaceTimer.Business
         private readonly object _syncLock = new object();
         private bool _connected;
         private bool _isReading;
-        private int _nextBib;
         private readonly Dictionary<ReaderModel, IDeviceAdapter> _deviceStrategies =
             new Dictionary<ReaderModel, IDeviceAdapter>();
         private Race _race;
 
         private readonly SplitRepository _splitRepository = new SplitRepository();
         private readonly AthleteRepository _athleteRepository = new AthleteRepository();
-        private ObservableCollection<Athlete> _athletes;
+     
+        private readonly AthleteManager _athleteManager;
+     
 
         public ObservableCollection<AthleteSplit> AthleteSplits;
 
-        public RfidManager()
+        public RfidManager(AthleteManager athleteManager)
         {
+            _athleteManager = athleteManager;
             _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
             _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
 
@@ -70,19 +71,6 @@ namespace RaceTimer.Business
             }
         }
 
-        public int NextBib
-        {
-            get { return _nextBib; }
-            set
-            {
-                if (_nextBib != value)
-                {
-                    _nextBib = value;
-                    OnPropertyChanged("NextBib");
-                }
-            }
-        }
-
         public void SetUp(IEnumerable<ReaderProfile> readerProfiles)
         {
             _readerProfiles = readerProfiles;
@@ -93,15 +81,29 @@ namespace RaceTimer.Business
                 device.Setup(readerProfile);
 
                 device.OnRecordTag += OnRecordTag;
+                device.OnAssignTag += _athleteManager.OnAssignTag;
                 Connected = device.OpenConnection();
             }
+        }
+
+       
+
+        public bool EnableReader(ReaderProfile readerProfile)
+        {
+            var device = _deviceStrategies[readerProfile.Model];
+           
+            device.Setup(readerProfile);
+
+            device.OnRecordTag += OnRecordTag;
+            device.OnAssignTag += _athleteManager.OnAssignTag;
+            return device.OpenConnection();
         }
 
         public void ClearSplits()
         {
             AthleteSplits.Clear();
         }
-
+       
         public void Start(Race race)
         {
             _race = race;
@@ -113,9 +115,9 @@ namespace RaceTimer.Business
             }
         }
 
-        public void StartAssigning(ObservableCollection<Athlete> athletes)
+        public void StartAssigning()
         {
-            _athletes = athletes;
+
             foreach (var readerProfile in _readerProfiles)
             {
                 IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
@@ -134,6 +136,11 @@ namespace RaceTimer.Business
 
         public bool CloseAll()
         {
+            if (_readerProfiles == null)
+            {
+                return false;
+            }
+
             foreach (var readerProfile in _readerProfiles)
             {
                 IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
@@ -158,12 +165,6 @@ namespace RaceTimer.Business
             {
                 lock (_syncLock)
                 {
-                    if (_readerProfiles.All(x => x.ReadingMode == ReadingMode.Desktop))
-                    {
-                        AssignTag(split);
-                        return;
-                    }
-
                     RecordSplit(split);
                 }
             });
@@ -174,96 +175,49 @@ namespace RaceTimer.Business
             split.SplitTime = split.DateTimeOfDay.Subtract(_race.StartDateTime.TimeOfDay)
                 .ToString("HH:mm:ss:ff");
             split.RaceId = _race.Id;
+            split.SplitDeviceId = split.SplitDeviceId;
+            split.SplitName = split.SplitName;
+            string atheleteName = String.Empty;
+
+            Athlete athelete = _athleteManager.Athletes.FirstOrDefault(x => x.TagId == split.Epc);
+            if (athelete != null)
+            {
+                atheleteName = string.IsNullOrEmpty(athelete.FirstName)  ? ""  : athelete.FirstName;
+
+                //atheleteName  = atheleteName + string.IsNullOrEmpty(athelete.LastName) ? "" : athelete.LastName) : "";
+            }
+            else
+            {
+                athelete = new Athlete
+                {
+                    TagId = split.Epc,
+                    TagAssignDateTime = DateTime.Now
+                };
+                _athleteRepository.Add(athelete);
+           //     _athleteRepository.Save();
+            }
+
+            split.Athlete = athelete;
+            split.AthleteId = athelete.Id;
+            split.AthleteName = atheleteName;
+            var splitCount = AthleteSplits.Count(x => x.Epc == split.Epc && x.SplitDeviceId == split.SplitDeviceId) + 1;
+            split.SplitLapCount = splitCount;
 
             AthleteSplits.Insert(0, new AthleteSplit
             {
-                AtheleteName = "",
+                AtheleteName = atheleteName,
                 Epc = split.Epc,
                 Time = split.DateTimeOfDay,
                 SplitTime = split.DateTimeOfDay.Subtract(_race.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff"),
                 Rssi = split.Rssi,
                 SplitName = split.SplitName,
+                SplitDeviceId = split.SplitDeviceId,
+                SplitLapCount = splitCount,
+                Bib = athelete.Bib
             });
             _splitRepository.Add(split);
             _splitRepository.Save();
         }
-
-        private void AssignTag(Split split)
-        {
-            Athlete nextAthlete;
-
-
-            var all = _athletes;
-                //_athleteRepository.GetAll();
-
-            if (all.Any())
-            {
-                if (all.Any(x => x.TagId == split.Epc))
-                {
-                    //prevent duplicates
-                    return;
-                }
-
-                int maxBib = all.Max(x => x.Bib);
-
-                NextBib = ++maxBib;
-
-                nextAthlete = all.SingleOrDefault(x => x.Bib == NextBib && string.IsNullOrEmpty(x.TagId));
-                if (nextAthlete != null)
-                {
-                    nextAthlete.TagId = split.Epc;
-                    _athleteRepository.Edit(nextAthlete, nextAthlete.Id);
-                    _athleteRepository.Save();
-                }
-                else
-                {
-                    nextAthlete = all.FirstOrDefault(x => x.Bib == 0);
-                    if (nextAthlete != null)
-                    {
-                        nextAthlete.Bib = NextBib;
-                        nextAthlete.TagId = split.Epc;
-                        _athleteRepository.Edit(nextAthlete, nextAthlete.Id);
-                        _athleteRepository.Save();
-                    }
-                    else
-                    {
-                        nextAthlete = new Athlete
-                        {
-                            Bib = NextBib,
-                            TagId = split.Epc
-                        };
-                        _athleteRepository.Add(nextAthlete);
-                        _athleteRepository.Save();
-
-                        Application.Current.Dispatcher.Invoke((Action) (() =>
-                        {
-                            _athletes.Insert(0, nextAthlete);
-                        }));
-                    }
-                }
-            }
-            else
-            {
-                nextAthlete = new Athlete
-                {
-                    Bib = 1,
-                    TagId = split.Epc
-                };
-                _athleteRepository.Add(nextAthlete);
-                _athleteRepository.Save();
-                Application.Current.Dispatcher.Invoke((Action)(() =>
-                {
-                    _athletes.Insert(0, nextAthlete);
-                }));
-            }
-        
-
-       
-
-            return;
-        }
-
-        
 
         public event PropertyChangedEventHandler PropertyChanged;
 

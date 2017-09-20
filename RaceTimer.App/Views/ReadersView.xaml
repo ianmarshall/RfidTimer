@@ -27,7 +27,7 @@
             <TextBlock Name="tbIsReading" Text="{Binding IsReading}"></TextBlock>
         </StackPanel>
 
-        <ItemsControl Grid.Row="2" Grid.Column="1" x:Name="readers">
+        <ItemsControl Grid.Row="2" Grid.Column="1" Name="readersControl">
             <ItemsControl.ItemsPanel>
                 <!-- specify the panel that is the container for your items -->
                 <ItemsPanelTemplate>
@@ -37,9 +37,10 @@
             <!-- specify the template used to render each item -->
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
+                    
                     <GroupBox Header="{Binding Id}" HeaderStringFormat="{}Reader {0}" Margin="5" Padding="10">
                         <Grid HorizontalAlignment="Left" VerticalAlignment="Top"
-                              Width="253" Margin="0,0,-2,-12">
+                              Width="400" Margin="0,0,-2,-12">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="30" />
                                 <RowDefinition Height="Auto" />
@@ -48,32 +49,37 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="1" Margin="1" >
+                            <StackPanel Grid.Row="1" Margin="5" >
                                 <Label Content="Name"
                                 HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <TextBox Text="{Binding Name}"></TextBox>
                                 <Label Content="Model"
                                        HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <ComboBox  SelectedValue="{Binding Model, Mode=TwoWay}" ItemsSource="{Binding Models}"/>
+                                <Label Content="Com Port"></Label>
+                                <ComboBox  SelectedValue="{Binding ComPort, Mode=TwoWay}" ItemsSource="{Binding ComPorts}"/>
+
+                                <Label Content="Inventory Search Mode (Session)"></Label>
+                                <ComboBox Name="cbInventorySearchMode"  SelectedValue="{Binding InventorySearchMode, Mode=TwoWay}" ItemsSource="{Binding InventorySearchModes}"/>
+
+                                <Label Content="Power"></Label>
+                                <ComboBox Name="cbPower"  SelectedValue="{Binding PowerDbm, Mode=TwoWay}" ItemsSource="{Binding Powers}"/>
+                                
                                 <Label Content="Reader Mode"></Label>
-                                <ComboBox  SelectedValue="{Binding ReadingMode, Mode=TwoWay}" ItemsSource="{Binding ReadingModes}"/>
+                                <ComboBox Name="cbReadingMode"  SelectedValue="{Binding ReadingMode, Mode=TwoWay}" ItemsSource="{Binding ReadingModes}" Tag="{Binding}" SelectionChanged="cbReadingMode_SelectionChanged"/>
                                 <Label Content="Frequency Band"
                                        HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <RadioButton GroupName="FreqBand" Content="EU" IsChecked="True"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <RadioButton GroupName="FreqBand" Content="US" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                                <Label Content="Ignore tag for detects for * seconds">
+                                <Label Content="Start read delay time">
                                     
                                 </Label>
-                                <ComboBox Width="40">
-                                    <ComboBoxItem IsSelected="True">0</ComboBoxItem>
-                                    <ComboBoxItem>5</ComboBoxItem>
-                                    <ComboBoxItem>30</ComboBoxItem>
-                                    <ComboBoxItem>90</ComboBoxItem>
-                                </ComboBox>
+                                <ComboBox  SelectedValue="{Binding StartReadDelay, Mode=TwoWay}" ItemsSource="{Binding StartReadDelays}"/>
                             </StackPanel>
                             <StackPanel Grid.Row="3" Orientation="Horizontal">
                                 <Button Margin="2" Height="30" Width="70" Content="Save" Tag="{Binding}" Click="Button_Click_Save" ></Button>
                                 <Button Margin="2" Height="30" Width="70" Content="Test" Tag="{Binding}" Click="Button_Click_Test" ></Button>
+                                <Button Name="btnEnable" Margin="2" Height="30" Width="70" Content="Enable" Tag="{Binding}" Click="btnEnable_Click"></Button>
                                 <Button Margin="2" Height="30" Width="70" Content="Remove" Tag="{Binding}" Click="Button_Click_Remove" ></Button>
                             </StackPanel>
                             <TextBlock Grid.Row="4" Text="{Binding Status, StringFormat={}Status: {0}}"></TextBlock>

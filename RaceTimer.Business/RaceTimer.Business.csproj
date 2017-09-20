@@ -48,8 +48,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AthleteManager.cs" />
     <Compile Include="ObservableStack.cs" />
+    <Compile Include="ReportManager.cs" />
     <Compile Include="RFIDManager.cs" />
+    <Compile Include="SplitClassMap.cs" />
     <Compile Include="TimerTextBlock.cs" />
     <Compile Include="ViewModel\SplitItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

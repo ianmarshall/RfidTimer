@@ -63,6 +63,7 @@
     <Compile Include="ReaderProfileRepository.cs" />
     <Compile Include="DeviceProfile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Result.cs" />
     <Compile Include="Split.cs" />
     <Compile Include="SplitRepository.cs" />
   </ItemGroup>
@@ -71,7 +72,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="RaceTimer.sdf" />
+    <Content Include="RaceTimer.sdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

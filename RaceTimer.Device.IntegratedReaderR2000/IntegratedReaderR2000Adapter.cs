@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
 using RaceTimer.Common;
 using RaceTimer.Data;
 using ReaderB;
-using MessageBox = System.Windows.Forms.MessageBox;
+//using MessageBox = System.Windows.Forms.MessageBox;
 
 
 namespace RaceTimer.Device.IntegratedReaderR2000
 {
-    public class IntegratedReaderR2000Adapter : IDeviceAdapter
+    public class IntegratedReaderR2000Adapter : DeviceAdapterBase, IDeviceAdapter
     {
         private int port, comPortIndex, openComIndex;
         private byte baudRate;
@@ -23,18 +19,11 @@ namespace RaceTimer.Device.IntegratedReaderR2000
         private bool isInventoryScan = false;
         private int openedPort;
         private byte fComAdr = 0xff;
-        private SplitRepository _tagRepo;
+        private byte powerDbm;
         private DateTime _raceTime;
         private ReaderProfile _readerProfile;
+        private static System.Timers.Timer _aTimer;
 
-
-        private static System.Timers.Timer aTimer;
-
-        public IntegratedReaderR2000Adapter()
-        {
-            //   _raceTime = raceTime;
-            _tagRepo = new SplitRepository();
-        }
 
         ~IntegratedReaderR2000Adapter()  // destructor
         {
@@ -44,19 +33,17 @@ namespace RaceTimer.Device.IntegratedReaderR2000
         public void Setup(ReaderProfile readerProfile)
         {
             _readerProfile = readerProfile;
-
         }
-
 
         public bool OpenConnection()
         {
 
             try
             {
-
-
                 comAddress = Convert.ToByte("FF", 16);
                 baudRate = Convert.ToByte(5);
+
+                powerDbm = Convert.ToByte(_readerProfile.PowerDbm);
 
                 port = 0;
                 int openResult;
@@ -66,20 +53,37 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
                 comAddress = Convert.ToByte("FF", 16);
                 baudRate = Convert.ToByte(5);
-                openResult = StaticClassReaderB.AutoOpenComPort(ref port, ref comAddress, baudRate, ref comPortIndex);//automatically detects a com port and connects it with the reader
+                if (_readerProfile.ComPort == ComPort.Auto)
+                {
+                    openResult =
+                        StaticClassReaderB.AutoOpenComPort(ref port, ref comAddress, baudRate,
+                            ref comPortIndex); //automatically detects a com port and connects it with the reader
+                }
+                else
+                {
+                    comPortIndex = (int)_readerProfile.ComPort;
+                    StaticClassReaderB.OpenComPort((int)_readerProfile.ComPort, ref comAddress, baudRate,
+                        ref comPortIndex);
+                }
                 openComIndex = comPortIndex;
 
                 if (openResult == 0)
                 {
-                    return true;
+                    var result = StaticClassReaderB.SetPowerDbm(ref fComAdr, powerDbm, openComIndex);
+                    if (result == 0)
+                    {
+        //                SetWorkingMode();
+                        return true;
+                    }
+
                 }
-                DialogResult result =
-                    MessageBox.Show("Serial Communication Error or Occupied - result code: " + openResult);
+
+                MessageBox.Show("Serial Communication Error or Occupied - result code: " + openResult);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                DialogResult result = MessageBox.Show("Serial Communication Error or Occupied - exception message " + e.Message);
+                MessageBox.Show("Serial Communication Error or Occupied - exception message " + e.Message);
             }
 
             return false;
@@ -100,28 +104,123 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             return false;
         }
 
-
         public bool BeginReading()
         {
             // Create a timer with a two second interval.
-            aTimer = new System.Timers.Timer(100);
+            _aTimer = new System.Timers.Timer(100);
             // Hook up the Elapsed event for the timer. 
-            aTimer.Elapsed += TimerTick;
-            aTimer.AutoReset = true;
-            aTimer.Enabled = true;
+            _aTimer.Elapsed += TimerTick;
+            _aTimer.AutoReset = true;
+            _aTimer.Enabled = false;
+            // _aTimer.Enabled = true;
+
+            StartReadDelay();
+
             return true;
         }
 
         public bool StopReading()
         {
-            aTimer.Enabled = false;
+            _aTimer.Enabled = false;
             return true;
         }
 
+
+        private void StartReadDelay()
+        {
+            if (_readerProfile.StartReadDelay == Data.StartReadDelay.None)
+            {
+                _aTimer.Enabled = true;
+                return;
+            }
+
+            int delayMiliSeconds = (int)_readerProfile.StartReadDelay * 1000;
+
+            Timer timer = new Timer();
+            timer.Interval = delayMiliSeconds;
+            timer.Tick += (s, e) =>
+            {
+                _aTimer.Enabled = true;
+                timer.Stop();
+            };
+            timer.Start();
+        }
+
+
+        private bool SetWorkingMode()
+        {
+            int Reader_bit0;
+            int Reader_bit1;
+            int Reader_bit2;
+            int Reader_bit3;
+            byte[] Parameter = new byte[6];
+            Parameter[0] = Convert.ToByte(1);// "0=Answer Mode", "1=Active mode"
+            if (true) //"EPCC1-G2
+                Reader_bit0 = 0; // "EPCC1-G2
+            else
+                Reader_bit0 = 1;
+            if (true)
+                Reader_bit1 = 0; //Wiegand Output
+            else
+                Reader_bit1 = 1;
+            if (true)  // buzzer
+                Reader_bit2 = 0; // Activate buzzer
+            else
+                Reader_bit2 = 1;
+            if (true)
+                Reader_bit3 = 0;  //Word Addr
+            else
+                Reader_bit3 = 1;
+
+            Parameter[1] = Convert.ToByte(Reader_bit0 * 1 + Reader_bit1 * 2 + Reader_bit2 * 4 + Reader_bit3 * 8);
+            //storage area or inquiry condcuted Tags
+            if (false)
+                Parameter[2] = 0; //Password
+            if (true)
+                Parameter[2] = 1; //EPC
+            if (false)
+                Parameter[2] = 2; //TID
+            if (false)
+                Parameter[2] = 3; //user
+            if (false)
+                Parameter[2] = 4; //Multi-Tag
+            if (false)
+                Parameter[2] = 5; //Single-Tag
+            //if (textBox3.Text == "")
+            //{
+            //    MessageBox.Show("Address is NULL!", "Information");
+            //    return;
+            //}
+            Parameter[3] = Convert.ToByte("02", 16); //was textBox3.Text
+            Parameter[4] = Convert.ToByte(1 + 1); //real word number
+            Parameter[5] = Convert.ToByte(0); ; //single tag filtering itme 
+
+
+            int resullt = StaticClassReaderB.SetWorkMode(ref fComAdr, Parameter, comPortIndex);
+            if (resullt == 0)
+            {
+                return true;
+
+            }
+
+            return false;
+        }
+
+        private void ToggleBuzzer()
+        {
+            byte activeTime = Convert.ToByte(5);
+            byte silentTime = Convert.ToByte(5);
+            byte times = Convert.ToByte(2);
+            int firmHandle = 2;
+            int result =
+                StaticClassReaderB.BuzzerAndLEDControl(ref comAddress, activeTime, silentTime, times, firmHandle);
+        }
+
+
         private void Inventory()
         {
-            byte Qvalue = Convert.ToByte(4);
-            byte Session = Convert.ToByte(2);
+            byte Qvalue = Convert.ToByte(5);
+            byte Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
             byte AdrTID = 0;
             byte LenTID = 0;
             byte TIDFlag = 0;
@@ -169,13 +268,19 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                         TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
                         Epc = sEPC,
                         Rssi = Convert.ToInt32(RSSI, 16).ToString(),
-                        SplitName = _readerProfile.Name
+                        SplitName = _readerProfile.Name,
+                        SplitDeviceId = _readerProfile.Id
                     };
-                    onRecordTag(tag);
+
+                    if (_readerProfile.ReadingMode == ReadingMode.Desktop)
+                    {
+                        onAssignTag(tag);
+                    }
+                    else
+                    {
+                        onRecordTag(tag);
+                    }
                 }
-
-
-                // _tagRepo.Add
             }
         }
 
@@ -184,12 +289,20 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             OnRecordTag?.Invoke(this, e);
         }
 
+        private void onAssignTag(EventArgs e)
+        {
+            OnAssignTag?.Invoke(this, e);
+        }
+
         public event EventHandler<EventArgs> OnRecordTag;
+        public event EventHandler<EventArgs> OnAssignTag;
 
         private void TimerTick(object sender, EventArgs e)
         {
             //if (fIsInventoryScan)
             //    return;
+
+
             Inventory();
         }
 
@@ -199,9 +312,6 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             foreach (byte b in data)
                 sb.Append(Convert.ToString(b, 16).PadLeft(2, '0'));
             return sb.ToString().ToUpper();
-
         }
-
-
     }
 }

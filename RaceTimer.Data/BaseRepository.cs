@@ -22,7 +22,7 @@ namespace RaceTimer.Data
         IGenericRepository<T> where T : class where C : DbContext, new()
     {
 
-        private C _entities = new C();
+        protected C _entities = new C();
         public C Context
         {
 

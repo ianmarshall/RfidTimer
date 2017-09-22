@@ -16,9 +16,20 @@ namespace RaceTimer.Data
         public DbSet<ReaderProfile> ReaderProfiles { get; set; }
         public DbSet<Split> Splits { get; set; }
         public DbSet<Athlete> Athletes { get; set; }
+
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+
+            modelBuilder.Entity<Split>()
+                        .HasOptional<Athlete>(x => x.Athlete);
+
+            //modelBuilder.Entity<WeekEnd>()
+            //            .HasMany<Day>(we => we.Days)
+            //            .WithOptional(d => d.WeekEnd);
+        }
+
     }
-
-
     public enum ConnectionType
     {
         Serial = 0,
@@ -45,6 +56,7 @@ namespace RaceTimer.Data
     {
         ChaFonIntegratedR2000,
         ChaFonFourChannelR2000,
+        UhfReader18Adapter,
         MotorolaFourChannelFx7400
     }
 

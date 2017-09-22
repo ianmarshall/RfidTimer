@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using RaceTimer.Business;
 using RaceTimer.Data;
+using NLog;
 
 namespace RaceTimer.App.Views
 {
@@ -14,6 +15,8 @@ namespace RaceTimer.App.Views
     /// </summary>
     public partial class ReadersView : UserControl
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         private RfidManager _rfidManager;
         private readonly ObservableCollection<ReaderProfile> _readers;
 
@@ -29,6 +32,8 @@ namespace RaceTimer.App.Views
             _readers = new ObservableCollection<ReaderProfile>(_readerProfileRepository.GetAll());
 
             readersControl.ItemsSource = _readers;
+
+          
         }
 
         private void btnAddReader_Click(object sender, System.Windows.RoutedEventArgs e)

@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfidTimer.Device.ChaFonFour
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "RaceTimerSetup", "RaceTimerSetup\RaceTimerSetup.vdproj", "{52673F8F-9BB2-465F-AD7B-378860F58A1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceTimer.Device.UhfReader18", "RaceTimer.Device.UhfReader18\RaceTimer.Device.UhfReader18.csproj", "{76FEACB6-C21F-4834-AF08-867CE46B0020}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +81,14 @@ Global
 		{52673F8F-9BB2-465F-AD7B-378860F58A1D}.Release|Any CPU.ActiveCfg = Release
 		{52673F8F-9BB2-465F-AD7B-378860F58A1D}.Release|x64.ActiveCfg = Release
 		{52673F8F-9BB2-465F-AD7B-378860F58A1D}.Release|x64.Build.0 = Release
+		{76FEACB6-C21F-4834-AF08-867CE46B0020}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76FEACB6-C21F-4834-AF08-867CE46B0020}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76FEACB6-C21F-4834-AF08-867CE46B0020}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{76FEACB6-C21F-4834-AF08-867CE46B0020}.Debug|x64.Build.0 = Debug|Any CPU
+		{76FEACB6-C21F-4834-AF08-867CE46B0020}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76FEACB6-C21F-4834-AF08-867CE46B0020}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76FEACB6-C21F-4834-AF08-867CE46B0020}.Release|x64.ActiveCfg = Release|Any CPU
+		{76FEACB6-C21F-4834-AF08-867CE46B0020}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

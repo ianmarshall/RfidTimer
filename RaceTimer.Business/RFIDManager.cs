@@ -11,13 +11,15 @@ using RaceTimer.Common;
 using RaceTimer.Data;
 using RaceTimer.Device.IntegratedReaderR2000;
 using RfidTimer.Device.ChaFonFourChannelR2000;
+using RaceTimer.Device.UhfReader18;
+using NLog;
 
 namespace RaceTimer.Business
 {
     public class RfidManager : INotifyPropertyChanged
     {
         //lock object for synchronization;
-
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private IEnumerable<ReaderProfile> _readerProfiles;
         private readonly object _syncLock = new object();
         private bool _connected;
@@ -27,10 +29,13 @@ namespace RaceTimer.Business
         private Race _race;
 
         private readonly SplitRepository _splitRepository = new SplitRepository();
+        private readonly ReaderProfileRepository _readerProfileRepository = new ReaderProfileRepository();
         private readonly AthleteRepository _athleteRepository = new AthleteRepository();
-     
+
         private readonly AthleteManager _athleteManager;
-     
+
+        private Dictionary<string, Athlete> _athleteDictionary;
+
 
         public ObservableCollection<AthleteSplit> AthleteSplits;
 
@@ -39,6 +44,8 @@ namespace RaceTimer.Business
             _athleteManager = athleteManager;
             _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
             _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
+            _deviceStrategies.Add(ReaderModel.UhfReader18Adapter, new UhfReader18Adapter());
+
 
             AthleteSplits = new ObservableCollection<AthleteSplit>();
             //Enable the cross acces to this collection elsewhere
@@ -83,15 +90,21 @@ namespace RaceTimer.Business
                 device.OnRecordTag += OnRecordTag;
                 device.OnAssignTag += _athleteManager.OnAssignTag;
                 Connected = device.OpenConnection();
+
+                if (Connected)
+                {
+                    _readerProfileRepository.Edit(readerProfile, readerProfile.Id);
+                    _readerProfileRepository.Save();
+                }
             }
         }
 
-       
+
 
         public bool EnableReader(ReaderProfile readerProfile)
         {
             var device = _deviceStrategies[readerProfile.Model];
-           
+
             device.Setup(readerProfile);
 
             device.OnRecordTag += OnRecordTag;
@@ -99,11 +112,12 @@ namespace RaceTimer.Business
             return device.OpenConnection();
         }
 
-        public void ClearSplits()
+        public void SetNewRace()
         {
+            _athleteDictionary = _athleteRepository.GetAll().ToList().Distinct(new AthleteComparer()).ToDictionary(x => x.TagId, x => x);
             AthleteSplits.Clear();
         }
-       
+
         public void Start(Race race)
         {
             _race = race;
@@ -172,40 +186,16 @@ namespace RaceTimer.Business
 
         private void RecordSplit(Split split)
         {
-            split.SplitTime = split.DateTimeOfDay.Subtract(_race.StartDateTime.TimeOfDay)
-                .ToString("HH:mm:ss:ff");
+            split.SplitTime = split.DateTimeOfDay.Subtract(_race.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff");
             split.RaceId = _race.Id;
             split.SplitDeviceId = split.SplitDeviceId;
             split.SplitName = split.SplitName;
-            string atheleteName = String.Empty;
 
-            Athlete athelete = _athleteManager.Athletes.FirstOrDefault(x => x.TagId == split.Epc);
-            if (athelete != null)
-            {
-                atheleteName = string.IsNullOrEmpty(athelete.FirstName)  ? ""  : athelete.FirstName;
-
-                //atheleteName  = atheleteName + string.IsNullOrEmpty(athelete.LastName) ? "" : athelete.LastName) : "";
-            }
-            else
-            {
-                athelete = new Athlete
-                {
-                    TagId = split.Epc,
-                    TagAssignDateTime = DateTime.Now
-                };
-                _athleteRepository.Add(athelete);
-           //     _athleteRepository.Save();
-            }
-
-            split.Athlete = athelete;
-            split.AthleteId = athelete.Id;
-            split.AthleteName = atheleteName;
             var splitCount = AthleteSplits.Count(x => x.Epc == split.Epc && x.SplitDeviceId == split.SplitDeviceId) + 1;
             split.SplitLapCount = splitCount;
 
-            AthleteSplits.Insert(0, new AthleteSplit
+            var atheleteSplit = new AthleteSplit
             {
-                AtheleteName = atheleteName,
                 Epc = split.Epc,
                 Time = split.DateTimeOfDay,
                 SplitTime = split.DateTimeOfDay.Subtract(_race.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff"),
@@ -213,8 +203,28 @@ namespace RaceTimer.Business
                 SplitName = split.SplitName,
                 SplitDeviceId = split.SplitDeviceId,
                 SplitLapCount = splitCount,
-                Bib = athelete.Bib
-            });
+            };
+
+
+            if (_athleteDictionary != null && _athleteDictionary.ContainsKey(split.Epc))
+            {
+                Athlete athlete = _athleteDictionary[split.Epc];
+                split.Athlete = athlete;
+                split.AthleteId = athlete.Id;
+
+                atheleteSplit.AthleteId = athlete.Id;
+                atheleteSplit.AtheleteName = string.Format("{0} {1}", athlete.FirstName, athlete.LastName);
+            }
+
+            logger.Info("Read tag split: {0}", split.ToString());
+
+            if (AthleteSplits.Contains(atheleteSplit))
+            {
+                return;
+            }
+
+            AthleteSplits.Insert(0, atheleteSplit);
+
             _splitRepository.Add(split);
             _splitRepository.Save();
         }

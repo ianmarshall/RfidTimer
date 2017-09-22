@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Text;
-using System.Windows.Forms;
+using System.Windows;
 using RaceTimer.Common;
 using RaceTimer.Data;
-using ReaderB;
-using System.IO.Ports;
 using NLog;
+
 //using MessageBox = System.Windows.Forms.MessageBox;
 
 
-namespace RaceTimer.Device.IntegratedReaderR2000
+namespace RaceTimer.Device.UhfReader18
 {
-    public class IntegratedReaderR2000Adapter : DeviceAdapterBase, IDeviceAdapter
+    public class UhfReader18Adapter : DeviceAdapterBase, IDeviceAdapter
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private int port, comPortIndex, openComIndex;
@@ -28,7 +27,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
         private static System.Timers.Timer _aTimer;
 
 
-        ~IntegratedReaderR2000Adapter()  // destructor
+        ~UhfReader18Adapter()  // destructor
         {
             CloseConnection();
         }
@@ -43,17 +42,6 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
             try
             {
-               // SerialPort port2 = new SerialPort();
-
-             //   SerialPort port1 = new SerialPort("COM7", 9600, Parity.None, 8, StopBits.One);
-             //   port1.Open();
-
-             //   port1.DiscardOutBuffer();
-             //   port1.DiscardInBuffer();
-             //   port1.Close();
-             ////   port.DataReceived -= new SerialDataReceivedEventHandler(onDataReceived);
-             //   port1 = null;
-
                 comAddress = Convert.ToByte("FF", 16);
                 baudRate = Convert.ToByte(5);
 
@@ -72,15 +60,12 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                     openResult =
                         StaticClassReaderB.AutoOpenComPort(ref port, ref comAddress, baudRate,
                             ref comPortIndex); //automatically detects a com port and connects it with the reader
-                   
                 }
                 else
                 {
-                    comPortIndex = (int) _readerProfile.ComPort;
+                    comPortIndex = (int)_readerProfile.ComPort;
                     openResult = StaticClassReaderB.OpenComPort(comPortIndex, ref comAddress, baudRate,
                         ref comPortIndex);
-
-                  
                 }
                 openComIndex = comPortIndex;
 
@@ -93,14 +78,14 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                         return true;
                     }
 
-                   
-            }
+
+                }
                 logger.Error("Serial Communication Error or Occupied - result code : {0}", openResult);
                 MessageBox.Show("Serial Communication Error or Occupied - result code: " + openResult);
             }
             catch (Exception ex)
             {
-                logger.Error("Open connection: {0}, {1}", ex.Message, ex.StackTrace);
+                logger.Error("Open connection: {0}, {1}", ex.Message, ex.ToString());
                 MessageBox.Show("Serial Communication Error or Occupied - exception message " + ex.Message);
             }
 
@@ -152,16 +137,16 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                 return;
             }
 
-            int delayMiliSeconds = (int)_readerProfile.StartReadDelay * 1000;
+            //int delayMiliSeconds = (int)_readerProfile.StartReadDelay * 1000;
 
-            Timer timer = new Timer();
-            timer.Interval = delayMiliSeconds;
-            timer.Tick += (s, e) =>
-            {
-                _aTimer.Enabled = true;
-                timer.Stop();
-            };
-            timer.Start();
+            //Timer timer = new Timer();
+            //timer.Interval = delayMiliSeconds;
+            //timer.Tick += (s, e) =>
+            //{
+            //    _aTimer.Enabled = true;
+            //    timer.Stop();
+            //};
+            //timer.Start();
         }
 
 
@@ -214,7 +199,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             Parameter[5] = Convert.ToByte(0); ; //single tag filtering itme 
 
 
-             int resullt = StaticClassReaderB.SetWorkMode(ref fComAdr, Parameter, comPortIndex);
+            int resullt = StaticClassReaderB.SetWorkMode(ref fComAdr, Parameter, comPortIndex);
             if (resullt == 0)
             {
                 return true;
@@ -230,16 +215,17 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             byte silentTime = Convert.ToByte(5);
             byte times = Convert.ToByte(2);
             int firmHandle = 2;
-            int result =
-                StaticClassReaderB.BuzzerAndLEDControl(ref comAddress, activeTime, silentTime, times, firmHandle);
+            //int result =
+            //    StaticClassReaderB.BuzzerAndLEDControl(ref comAddress, activeTime, silentTime, times, firmHandle);
         }
 
 
         private void Inventory()
         {
-            byte Qvalue = Convert.ToByte(5);
-            byte Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
-           
+            byte Qvalue = Convert.ToByte(0);
+            byte Session = Convert.ToByte(0);
+            // Convert.ToByte((int)_readerProfile.InventorySearchMode);
+
             byte AdrTID = 0;
             byte LenTID = 0;
             byte TIDFlag = 0;
@@ -251,8 +237,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             string s, sEPC;
             string temps;
 
-            int fCmdRet = StaticClassReaderB.Inventory_G2(ref fComAdr, Qvalue, Session, AdrTID, LenTID, TIDFlag, EPC,
-                ref Totallen, ref CardNum, comPortIndex);
+            int fCmdRet = StaticClassReaderB.Inventory_G2(ref fComAdr, AdrTID, LenTID, TIDFlag, EPC, ref Totallen, ref CardNum, comPortIndex);
 
             if ((fCmdRet == 1) | (fCmdRet == 2) | (fCmdRet == 3) | (fCmdRet == 4) | (fCmdRet == 0xFB)) //end of read
             {
@@ -267,14 +252,14 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                     return;
                 }
 
+               
                 string lastEPC = "";
                 for (CardIndex = 0; CardIndex < CardNum; CardIndex++)
                 {
+
                     EPClen = daw[m];
                     sEPC = temps.Substring(m * 2 + 2, EPClen * 2);
-                    lastEPC = sEPC;
-                    string RSSI = temps.Substring(m * 2 + 2 + EPClen * 2, 2);
-                    m = m + EPClen + 2;
+                    m = m + EPClen + 1;
                     if (sEPC.Length != EPClen * 2)
                     {
                         return;
@@ -286,7 +271,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                         DateTimeOfDay = readTime,
                         TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
                         Epc = sEPC,
-                        Rssi = Convert.ToInt32(RSSI, 16).ToString(),
+                       // Rssi = Convert.ToInt32(RSSI, 16).ToString(),
                         SplitName = _readerProfile.Name,
                         SplitDeviceId = _readerProfile.Id
                     };

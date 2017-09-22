@@ -20,7 +20,7 @@ namespace RaceTimer.Data
         }
     }
 
-    public sealed class Athlete : INotifyPropertyChanged
+    public sealed class Athlete : INotifyPropertyChanged, IEquatable<Athlete>
     {
         private int _bib;
         private string _tagId;
@@ -74,6 +74,24 @@ namespace RaceTimer.Data
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public bool Equals(Athlete other)
+        {
+            return TagId == other.TagId;
+        }
+    }
+
+    public class AthleteComparer : IEqualityComparer<Athlete>
+    {
+        public bool Equals(Athlete x, Athlete y)
+        {
+            return x.TagId == y.TagId;
+        }
+
+        public int GetHashCode(Athlete obj)
+        {
+            return obj.TagId.GetHashCode();
         }
     }
 }

@@ -42,8 +42,7 @@ namespace RaceTimer.App
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-           
-
+            RfidManager.CloseAll();
         }
     }
 }

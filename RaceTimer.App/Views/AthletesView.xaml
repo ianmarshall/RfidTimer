@@ -37,7 +37,9 @@
                   RowHeight="25">
             
         </DataGrid>
-        
+        <StackPanel Grid.Row="4" Grid.Column="1">
+            <Button Margin="5" Content="Save" Name="btnSave" Click="btnSave_Click" Width="120"></Button>
+        </StackPanel>
         
     </Grid>
 </UserControl>

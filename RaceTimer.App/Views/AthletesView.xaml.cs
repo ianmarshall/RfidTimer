@@ -49,16 +49,21 @@ namespace RaceTimer.App.Views
 
         private void dgAthletes_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
-            Athlete athlete = (Athlete)e.Row.Item;
-            if (athlete.Id > 0)
+            if (e.EditAction == DataGridEditAction.Commit)
             {
-                _athleteRepository.Edit(athlete, athlete.Id);
+                // Athlete athlete = (Athlete)dgAthletes.SelectedItem;
+
+                Athlete athlete = e.Row.DataContext as Athlete;
+                if (athlete.Id > 0)
+                {
+                    _athleteRepository.Edit(athlete, athlete.Id);
+                }
+                else
+                {
+                    _athleteRepository.Add(athlete);
+                }
+                _athleteRepository.Save();
             }
-            else
-            {
-                _athleteRepository.Add(athlete);
-            }
-            _athleteRepository.Save();
 
         }
 
@@ -92,6 +97,16 @@ namespace RaceTimer.App.Views
         {
             _rfidManager.Stop();
             btnStopAssign.IsEnabled = false;
+        }
+
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var ath in _athleteManager.Athletes)
+            {
+                _athleteRepository.Edit(ath, ath.Id);
+                _athleteRepository.Save();
+            }
         }
     }
 }

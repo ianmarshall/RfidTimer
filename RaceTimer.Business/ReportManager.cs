@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using CsvHelper;
-using RaceTimer.Business.ViewModel;
 using RaceTimer.Data;
 
 namespace RaceTimer.Business
@@ -52,22 +45,22 @@ namespace RaceTimer.Business
 
         public void LoadResults(Race race)
         {
-            IQueryable<IGrouping<int, Split>> athleteSplits =
-                _splitRepository.FindBy(x => x.RaceId == race.Id).GroupBy(x => x.AthleteId);
+            //IQueryable<IGrouping<int, Split>> athleteSplits =
+            //    _splitRepository.FindBy(x => x.RaceId == race.Id).GroupBy(x => x.AthleteId);
 
-            foreach (IGrouping<int, Split> athleteSplit in athleteSplits)
-            {
-                var group = athleteSplit.ToList().OrderBy(x => x.SplitLapCount);
+            //foreach (IGrouping<int, Split> athleteSplit in athleteSplits)
+            //{
+            //    var group = athleteSplit.ToList().OrderBy(x => x.SplitLapCount);
 
-                //var result = new Result();
-                //result.Bib = athleteSplit.FirstOrDefault().Athlete.FirstName;
+            //    //var result = new Result();
+            //    //result.Bib = athleteSplit.FirstOrDefault().Athlete.FirstName;
 
 
-                //foreach (var split in group)
-                //{
+            //    //foreach (var split in group)
+            //    //{
                     
-                //}
-            }
+            //    //}
+            //}
 
         }
 
@@ -81,9 +74,18 @@ namespace RaceTimer.Business
                 using (var csvWriter = new CsvWriter(sw))
                 {
                     csvWriter.Configuration.HasHeaderRecord = true;
-                    csvWriter.Configuration.AutoMap<SplitClassMap>();
-                    
-                    csvWriter.WriteRecords(Splits);
+                    //csvWriter.Configuration.AutoMap<SplitClassMap>();
+                    csvWriter.WriteHeader<Split>();
+                    foreach (var item in Splits)
+                    {
+                      
+                        csvWriter.WriteField(item.AthleteName);
+                        csvWriter.WriteField(item.DateTimeOfDay);
+                        csvWriter.WriteField(item.Epc);
+                        csvWriter.NextRecord();
+                    }
+
+                //    csvWriter.WriteRecords(Splits);
                     sw.Flush();
                 }
             }

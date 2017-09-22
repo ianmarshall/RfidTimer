@@ -105,8 +105,10 @@ namespace RaceTimer.Business
                         nextAthlete.TagId = split.Epc;
                         _athleteRepository.Edit(nextAthlete, nextAthlete.Id);
                         _athleteRepository.Save();
+                        Message =
+                       $"Tag {split.Epc} assigned to { nextAthlete.Bib}";
                     }
-                    else
+                    else if (Athletes.Any(x=>x.Bib == NextBib) == false)
                     {
                         nextAthlete = new Athlete
                         {
@@ -120,9 +122,10 @@ namespace RaceTimer.Business
                         {
                             Athletes.Insert(0, nextAthlete);
                         }));
+                        Message =
+                       $"Tag {split.Epc} assigned to { nextAthlete.Bib}";
                     }
-                    Message =
-                        $"Tag {split.Epc} assigned to { nextAthlete.Bib} { nextAthlete.FirstName} { nextAthlete.LastName}";
+                   
                     return;
                 }
             }

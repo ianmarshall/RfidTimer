@@ -1,3 +1,4 @@
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -21,6 +22,7 @@ namespace RaceTimer.Data
     public abstract class BaseRepository<C, T> :
         IGenericRepository<T> where T : class where C : DbContext, new()
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         protected C _entities = new C();
         public C Context
@@ -71,12 +73,23 @@ namespace RaceTimer.Data
 
         public virtual void Save()
         {
-            //using (DbContextTransaction dbTran = _entities.Database.BeginTransaction())
-            //{
+            try
+            {
+
+                //using (DbContextTransaction dbTran = _entities.Database.BeginTransaction())
+                //{
                 _entities.SaveChanges();
                 //commit transaction
-            //    dbTran.Commit();
-            //}
+                //    dbTran.Commit();
+                //}
+
+            }
+            catch(Exception ex)
+            {
+                logger.Error(ex);
+
+                throw;
+            }
         }
 
         public bool IsDirty()

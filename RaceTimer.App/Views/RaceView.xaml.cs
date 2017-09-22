@@ -87,7 +87,7 @@ namespace RaceTimer.App.Views
 
             _reportManager.Races.Insert(0, _race);
 
-            _rfidManager.ClearSplits();
+            _rfidManager.SetNewRace();
 
             btnStartTimer.IsEnabled = true;
             btnStopTimer.IsEnabled = false;

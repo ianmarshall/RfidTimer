@@ -144,12 +144,16 @@ namespace RaceTimer.Business
                     Bib = NextBib,
                     TagId = split.Epc
                 };
-                _athleteRepository.Add(nextAthlete);
-                _athleteRepository.Save();
+
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
+                   
                     Athletes.Insert(0, nextAthlete);
                 }));
+
+                _athleteRepository.Add(nextAthlete);
+                _athleteRepository.Save();
+               
 
                 Message =
                     $"Tag {split.Epc} assigned to {nextAthlete.Bib} with no athlete name";

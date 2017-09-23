@@ -7,6 +7,7 @@ namespace RaceTimer.Business.ViewModel
     {
         private int _timeOut = 5;
 
+        public int Position { get; set; }
         public int Bib { get; set; }
         public string AtheleteName { get; set; }
         public int AthleteId { get; set; }
@@ -14,8 +15,8 @@ namespace RaceTimer.Business.ViewModel
         public int SplitDeviceId { get; set; }
         public int SplitLapCount { get; set; }
         public string Epc { get; set; }
-        public int TagId { get; set; }
         public DateTime Time { get; set; }
+        public string RaceTime { get; set; }
         public string SplitTime { get; set; }
         public string Rssi { get; set; }
 
@@ -49,12 +50,12 @@ namespace RaceTimer.Business.ViewModel
     {
         public bool Equals(AthleteSplit x, AthleteSplit y)
         {
-            return x.TagId == y.TagId && IsDuplicateRead(x, y);
+            return x.Epc == y.Epc && IsDuplicateRead(x, y);
         }
 
         public int GetHashCode(AthleteSplit obj)
         {
-            return obj.TagId.GetHashCode();
+            return obj.Epc.GetHashCode();
         }
 
         private bool IsDuplicateRead(AthleteSplit x, AthleteSplit y)

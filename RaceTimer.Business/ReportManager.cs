@@ -4,6 +4,9 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using CsvHelper;
 using RaceTimer.Data;
+using RaceTimer.Business.Reports;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace RaceTimer.Business
 {
@@ -14,9 +17,9 @@ namespace RaceTimer.Business
         private AthleteRepository _athleteRepository;
 
         public ObservableCollection<Race> Races;
-        public ObservableCollection<Split> Splits;
-        private Race _currentRace;
+        public List<SplitResult> SplitResults;
 
+        private Race _currentRace;
 
         public ReportManager()
         {
@@ -24,15 +27,11 @@ namespace RaceTimer.Business
             _splitRepository = new SplitRepository();
             _athleteRepository = new AthleteRepository();
             Races = new ObservableCollection<Race>(_raceRepository.GetAll());
-
         }
-
 
         public void LoadSplits(Race race)
         {
             _currentRace = race;
-
-            Splits = new ObservableCollection<Split>(_splitRepository.FindBy(x => x.RaceId == race.Id));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -42,26 +41,41 @@ namespace RaceTimer.Business
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-
-        public void LoadResults(Race race)
+        public List<SplitResult> LoadResults(Race race)
         {
-            //IQueryable<IGrouping<int, Split>> athleteSplits =
-            //    _splitRepository.FindBy(x => x.RaceId == race.Id).GroupBy(x => x.AthleteId);
+            SplitResults = new List<SplitResult>();
+            _currentRace = race;
 
-            //foreach (IGrouping<int, Split> athleteSplit in athleteSplits)
-            //{
-            //    var group = athleteSplit.ToList().OrderBy(x => x.SplitLapCount);
+            var athletes = _athleteRepository.GetAll(); //FindBy(x => x.Races.Any(y => y.Id == race.Id));
+            var splits = _splitRepository.FindBy(x => x.RaceId == race.Id && x.AthleteId > 0);
 
-            //    //var result = new Result();
-            //    //result.Bib = athleteSplit.FirstOrDefault().Athlete.FirstName;
+            foreach (var athlete in athletes)
+            {
+                foreach (var split in splits.Where(x => x.AthleteId == athlete.Id))
+                {
+                    var splitposition = splits.Where(x => x.SplitLapCount == split.SplitLapCount).OrderBy(x=>x.DateTimeOfDay).ToList().FindIndex(x => x.AthleteId == athlete.Id) + 1;
 
+                    var splitResult = new SplitResult
+                    {
+                        OveralPosition = splitposition,
+                        AthleteName = split.AthleteName,
+                        Bib = split.Bib,
+                        SplitTime = split.SplitTime,
+                        TimeOfDay = split.TimeOfDay,
+                        SplitName = split.SplitName,
+                        RaceTime = split.RaceTime,
+                        LapNumber = split.SplitLapCount,
+                        Epc = split.Epc,
+                        RaceName = split.Race.Name,
+                        Rssi = split.Rssi
+                    };
 
-            //    //foreach (var split in group)
-            //    //{
-                    
-            //    //}
-            //}
+                    SplitResults.Add(splitResult);
+                }
+            }
+            SplitResults = SplitResults.OrderByDescending(x => x.LapNumber).ThenBy(x=>x.OveralPosition).ToList();
 
+            return SplitResults;
         }
 
         public void ExportResults()
@@ -75,17 +89,18 @@ namespace RaceTimer.Business
                 {
                     csvWriter.Configuration.HasHeaderRecord = true;
                     //csvWriter.Configuration.AutoMap<SplitClassMap>();
-                    csvWriter.WriteHeader<Split>();
-                    foreach (var item in Splits)
-                    {
-                      
-                        csvWriter.WriteField(item.AthleteName);
-                        csvWriter.WriteField(item.DateTimeOfDay);
-                        csvWriter.WriteField(item.Epc);
-                        csvWriter.NextRecord();
-                    }
+                    csvWriter.WriteHeader<SplitResult>();
+                   // csvWriter.WriteField("Race Start" + _currentRace.StartDateTime);
+                    //foreach (var item in Splits)
+                    //{
 
-                //    csvWriter.WriteRecords(Splits);
+                    //    csvWriter.WriteField(item.AthleteName);
+                    //    csvWriter.WriteField(item.DateTimeOfDay);
+                    //    csvWriter.WriteField(item.Epc);
+                    //    csvWriter.NextRecord();
+                    //}
+
+                    csvWriter.WriteRecords(SplitResults);
                     sw.Flush();
                 }
             }

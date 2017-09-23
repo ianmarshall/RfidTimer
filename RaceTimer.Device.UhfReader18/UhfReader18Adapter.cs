@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text;
-using System.Windows;
 using RaceTimer.Common;
 using RaceTimer.Data;
 using NLog;
+using System.Windows.Forms;
 
 //using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -71,6 +71,7 @@ namespace RaceTimer.Device.UhfReader18
 
                 if (openResult == 0)
                 {
+                    logger.Info("Opened port {0} to UhfReader18", openComIndex);
                     var result = StaticClassReaderB.SetPowerDbm(ref fComAdr, powerDbm, openComIndex);
                     if (result == 0)
                     {
@@ -97,6 +98,7 @@ namespace RaceTimer.Device.UhfReader18
             try
             {
                 StaticClassReaderB.CloseSpecComPort(openComIndex);
+                logger.Info("Closed port {0} to UhfReader18", openComIndex);
                 return true;
             }
             catch (Exception ex)
@@ -134,19 +136,22 @@ namespace RaceTimer.Device.UhfReader18
             if (_readerProfile.StartReadDelay == Data.StartReadDelay.None)
             {
                 _aTimer.Enabled = true;
+                logger.Info("Started reading from UhfReader18");
                 return;
             }
 
-            //int delayMiliSeconds = (int)_readerProfile.StartReadDelay * 1000;
+            int delayMiliSeconds = (int)_readerProfile.StartReadDelay * 1000;
 
-            //Timer timer = new Timer();
-            //timer.Interval = delayMiliSeconds;
-            //timer.Tick += (s, e) =>
-            //{
-            //    _aTimer.Enabled = true;
-            //    timer.Stop();
-            //};
-            //timer.Start();
+            Timer timer = new Timer();
+            timer.Interval = delayMiliSeconds;
+            timer.Tick += (s, e) =>
+            {
+                _aTimer.Enabled = true;
+                timer.Stop();
+                logger.Info("Started reading at {0} from UhfReader18 after a {1} delay", DateTime.Now, _readerProfile.StartReadDelay);
+            };
+            timer.Start();
+            
         }
 
 

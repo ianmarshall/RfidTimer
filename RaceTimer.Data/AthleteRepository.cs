@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -27,9 +28,10 @@ namespace RaceTimer.Data
         public Athlete()
         {
             Races = new List<Race>();
-            Tags = new List<Split>();
+            Splits = new List<Split>();
         }
 
+        [Key]
         public int Id { get; set; }
         
         public int Bib
@@ -68,7 +70,7 @@ namespace RaceTimer.Data
         public string Club { get; set; }
 
         public ICollection<Race> Races { get; set; }
-        public ICollection<Split> Tags { get; set; }
+        public ICollection<Split> Splits { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)

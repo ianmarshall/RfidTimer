@@ -25,10 +25,22 @@
               SelectedValuePath="Name" 
               Width="120" SelectionChanged="cbRaces_SelectionChanged"/>
             <Button Content="Export CSV" Name="btnExport" Click="btnExport_Click"></Button>
-
+            <!--<Button Content="Auto refresh current race" Name="btnAutoRefresh" Click="btnAutoRefresh_Click"></Button>-->
+            <Label Content="Auto refresh current race"></Label>
+            <CheckBox Name="cbAutoRefresh" Checked="cbAutoRefresh_Checked" Unchecked="cbAutoRefresh_Unchecked"></CheckBox>
 
         </StackPanel>
-        <DataGrid Grid.Row="3" Grid.Column="1" Name="dgSplits" IsReadOnly="True" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
+        <!--<DataGrid Grid.Row="3" Grid.Column="1" Name="dgSplits" IsReadOnly="True" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700">
+
+
+            --><!--<DataGrid.Columns>
+                <DataGridTextColumn SortMemberPath="SplitTime" SortDirection="Descending" />
+            </DataGrid.Columns>--><!--
+
+        </DataGrid>-->
+
+        <DataGrid Grid.Row="4" Grid.Column="1" Name="dgResults" IsReadOnly="True" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700">
 
 

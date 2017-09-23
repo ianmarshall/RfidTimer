@@ -86,6 +86,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
                 if (openResult == 0)
                 {
+                    logger.Info("Opened port {0} to IntegratedReaderR2000", openComIndex);
                     var result = StaticClassReaderB.SetPowerDbm(ref fComAdr, powerDbm, openComIndex);
                     if (result == 0)
                     {
@@ -112,6 +113,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             try
             {
                 StaticClassReaderB.CloseSpecComPort(openComIndex);
+                logger.Info("Closed port {0} to IntegratedReaderR2000", openComIndex);
                 return true;
             }
             catch (Exception ex)
@@ -149,6 +151,9 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             if (_readerProfile.StartReadDelay == Data.StartReadDelay.None)
             {
                 _aTimer.Enabled = true;
+
+                logger.Info("Started reading from IntegratedReaderR2000");
+
                 return;
             }
 
@@ -158,9 +163,11 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             timer.Interval = delayMiliSeconds;
             timer.Tick += (s, e) =>
             {
+                logger.Info("Started reading at {0} from IntegratedReaderR2000 after a {1} delay", DateTime.Now, _readerProfile.StartReadDelay);
                 _aTimer.Enabled = true;
                 timer.Stop();
             };
+
             timer.Start();
         }
 

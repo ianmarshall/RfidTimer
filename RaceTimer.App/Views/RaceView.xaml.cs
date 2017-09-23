@@ -116,9 +116,10 @@ namespace RaceTimer.App.Views
         private void btnStopTimer_Click(object sender, RoutedEventArgs e)
         {
             // ttbTimer.IsStarted = false;
+            _race.FinishDateTime = DateTime.Now;
             _rfidManager.Stop();
             _timer.Stop();
-            _race.FinishDateTime = DateTime.Now;
+          
             _raceRepository.Edit(_race, _race.Id);
             _raceRepository.Save();
 

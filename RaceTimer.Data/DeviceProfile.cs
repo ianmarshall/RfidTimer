@@ -24,9 +24,9 @@ namespace RaceTimer.Data
             modelBuilder.Entity<Split>()
                         .HasOptional<Athlete>(x => x.Athlete);
 
-            //modelBuilder.Entity<WeekEnd>()
-            //            .HasMany<Day>(we => we.Days)
-            //            .WithOptional(d => d.WeekEnd);
+            //modelBuilder.Entity<Athlete>()
+            //            .HasMany<Split>(w => w.Splits)
+            //            .WithOptional(d => d.s);
         }
 
     }

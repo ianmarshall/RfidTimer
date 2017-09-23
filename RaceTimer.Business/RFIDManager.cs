@@ -26,7 +26,7 @@ namespace RaceTimer.Business
         private bool _isReading;
         private readonly Dictionary<ReaderModel, IDeviceAdapter> _deviceStrategies =
             new Dictionary<ReaderModel, IDeviceAdapter>();
-        private Race _race;
+        public Race CurrentRace;
 
         private readonly SplitRepository _splitRepository = new SplitRepository();
         private readonly ReaderProfileRepository _readerProfileRepository = new ReaderProfileRepository();
@@ -99,8 +99,6 @@ namespace RaceTimer.Business
             }
         }
 
-
-
         public bool EnableReader(ReaderProfile readerProfile)
         {
             var device = _deviceStrategies[readerProfile.Model];
@@ -120,7 +118,9 @@ namespace RaceTimer.Business
 
         public void Start(Race race)
         {
-            _race = race;
+            CurrentRace = race;
+
+            logger.Info("Started race {0} {1} at {2}", CurrentRace.Id, CurrentRace.Name, CurrentRace.StartDateTime);
 
             foreach (var readerProfile in _readerProfiles)
             {
@@ -146,6 +146,8 @@ namespace RaceTimer.Business
                 IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
                 IsReading = !device.StopReading();
             }
+
+            logger.Info("Finished race {0} {1} at {2}", CurrentRace.Id, CurrentRace.Name, CurrentRace.FinishDateTime);
         }
 
         public bool CloseAll()
@@ -186,23 +188,31 @@ namespace RaceTimer.Business
 
         private void RecordSplit(Split split)
         {
-            split.SplitTime = split.DateTimeOfDay.Subtract(_race.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff");
-            split.RaceId = _race.Id;
+            DateTime prevSplit = GetpreviousSplit(split.Epc);
+
+            split.RaceTime = split.DateTimeOfDay.Subtract(CurrentRace.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff");
+            split.SplitTime = split.DateTimeOfDay.Subtract(prevSplit.TimeOfDay).ToString("HH:mm:ss:ff");
+
+            split.RaceId = CurrentRace.Id;
             split.SplitDeviceId = split.SplitDeviceId;
             split.SplitName = split.SplitName;
 
             var splitCount = AthleteSplits.Count(x => x.Epc == split.Epc && x.SplitDeviceId == split.SplitDeviceId) + 1;
             split.SplitLapCount = splitCount;
 
+
+
             var atheleteSplit = new AthleteSplit
             {
+                Position = split.Position,
                 Epc = split.Epc,
                 Time = split.DateTimeOfDay,
-                SplitTime = split.DateTimeOfDay.Subtract(_race.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff"),
+                RaceTime = split.RaceTime,
+                SplitTime = split.SplitTime,
                 Rssi = split.Rssi,
                 SplitName = split.SplitName,
                 SplitDeviceId = split.SplitDeviceId,
-                SplitLapCount = splitCount,
+                SplitLapCount = splitCount
             };
 
 
@@ -211,9 +221,11 @@ namespace RaceTimer.Business
                 Athlete athlete = _athleteDictionary[split.Epc];
                 split.Athlete = athlete;
                 split.AthleteId = athlete.Id;
-
+                split.AthleteName = string.Format("{0} {1}", athlete.FirstName, athlete.LastName);
+                split.Bib = athlete.Bib;
                 atheleteSplit.AthleteId = athlete.Id;
-                atheleteSplit.AtheleteName = string.Format("{0} {1}", athlete.FirstName, athlete.LastName);
+                atheleteSplit.AtheleteName = split.AthleteName;
+                atheleteSplit.Bib = athlete.Bib;
             }
 
             logger.Info("Read tag split: {0}", split.ToString());
@@ -223,10 +235,43 @@ namespace RaceTimer.Business
                 return;
             }
 
+
+
             AthleteSplits.Insert(0, atheleteSplit);
 
-            _splitRepository.Add(split);
+
+
+            //var pos = AthleteSplits.Where(x => x.SplitLapCount == splitCount).OrderBy(x => x.Time).ToList();
+            //var count = pos.FindIndex(x => x.Epc == split.Epc);
+
+            //if (count <= 0)
+            //{
+            //    count = 1;
+            //}
+            //else
+            //{
+            //    count = count++;
+            //}
+
+            //split.Position = count;
+            //atheleteSplit.Position = count;
+
+
+            _splitRepository.AddSplit(split);
             _splitRepository.Save();
+        }
+
+        private DateTime GetpreviousSplit(string epc)
+        {
+            var split = AthleteSplits.OrderByDescending(x => x.Time).FirstOrDefault(x => x.Epc == epc);
+
+            if (split != null)
+            {
+
+                return split.Time;
+            }
+
+            return CurrentRace.StartDateTime;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

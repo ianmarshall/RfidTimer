@@ -95,6 +95,7 @@
       <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Controls.Ribbon" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -119,6 +120,9 @@
     <Compile Include="AssignTags.xaml.cs">
       <DependentUpon>AssignTags.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AthleteEdit.xaml.cs">
+      <DependentUpon>AthleteEdit.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\SplitItem.cs" />
     <Compile Include="ViewModels\SplitsViewModel.cs" />
     <Compile Include="Views\AthletesView.xaml.cs">
@@ -134,6 +138,10 @@
       <DependentUpon>ReportView.xaml</DependentUpon>
     </Compile>
     <Page Include="AssignTags.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AthleteEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

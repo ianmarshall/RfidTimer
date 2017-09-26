@@ -295,7 +295,8 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                         Epc = sEPC,
                         Rssi = Convert.ToInt32(RSSI, 16).ToString(),
                         SplitName = _readerProfile.Name,
-                        SplitDeviceId = _readerProfile.Id
+                        SplitDeviceId = _readerProfile.Id,
+                        InventorySearchMode = _readerProfile.InventorySearchMode
                     };
 
                     if (_readerProfile.ReadingMode == ReadingMode.Desktop)

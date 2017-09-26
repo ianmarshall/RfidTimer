@@ -1,0 +1,25 @@
+﻿<Window x:Class="RaceTimer.App.AthleteEdit"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RaceTimer.App"
+        mc:Ignorable="d"
+        Title="AthleteEdit" Height="300" Width="600"
+        Closing="Window_Closing">
+    <Grid Name="grdEdit">
+        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="93,229,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click"/>
+        <Label x:Name="label" Content="Bib" HorizontalAlignment="Left" Margin="28,31,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="tbBib" Text="{Binding Bib}" HorizontalAlignment="Left" Height="23" Margin="93,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="label1" Content="Name" HorizontalAlignment="Left" Margin="28,62,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="tbFirstName" Text="{Binding FirstName}" HorizontalAlignment="Left" Height="23" Margin="93,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="tbLastName" Text="{Binding LastName}" HorizontalAlignment="Left" Height="23" Margin="234,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="163"/>
+        <Label x:Name="label2" Content="Gendor" HorizontalAlignment="Left" Margin="28,102,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cbGendor"  SelectedValue="{Binding Gendor, Mode=TwoWay}" ItemsSource="{Binding Gendors}" HorizontalAlignment="Left" Margin="93,102,0,0" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="label3" Content="Age cat" HorizontalAlignment="Left" Margin="28,140,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cbAgeCat"  SelectedValue="{Binding AgeCategory, Mode=TwoWay}" ItemsSource="{Binding AgeCategories}" HorizontalAlignment="Left" Margin="93,144,0,0" VerticalAlignment="Top" Width="120"/>
+        <Label x:Name="label4" Content="Tag Id" HorizontalAlignment="Left" Margin="28,187,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="tbTagId" Text="{Binding TagId}" HorizontalAlignment="Left" Height="23" Margin="93,190,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="242"/>
+
+    </Grid>
+</Window>

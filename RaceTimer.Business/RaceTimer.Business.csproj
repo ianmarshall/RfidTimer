@@ -53,8 +53,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AthleteManager.cs" />
-    <Compile Include="ObservableStack.cs" />
     <Compile Include="ReportManager.cs" />
+    <Compile Include="Reports\AthleteRepository.cs" />
     <Compile Include="Reports\SplitResult.cs" />
     <Compile Include="RFIDManager.cs" />
     <Compile Include="SplitClassMap.cs" />

@@ -52,7 +52,7 @@
                             <StackPanel Grid.Row="1" Margin="5" >
                                 <Label Content="Name"
                                 HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                <TextBox Text="{Binding Name}"></TextBox>
+                                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"></TextBox>
                                 <Label Content="Model"
                                        HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <ComboBox  SelectedValue="{Binding Model, Mode=TwoWay}" ItemsSource="{Binding Models}"/>

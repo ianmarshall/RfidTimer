@@ -5,9 +5,8 @@ namespace RaceTimer.Business.ViewModel
 {
     public class AthleteSplit : IEquatable<AthleteSplit>
     {
-        private int _timeOut = 5;
+        private int _timeOut = 30;
 
-        public int Position { get; set; }
         public int Bib { get; set; }
         public string AtheleteName { get; set; }
         public int AthleteId { get; set; }
@@ -38,39 +37,6 @@ namespace RaceTimer.Business.ViewModel
             {
                 duration = other.Time - Time;
                 return duration.Seconds < _timeOut;
-            }
-            else
-            {
-                return true;
-            }
-        }
-    }
-
-    public class AthleteSplitComparer : IEqualityComparer<AthleteSplit>
-    {
-        public bool Equals(AthleteSplit x, AthleteSplit y)
-        {
-            return x.Epc == y.Epc && IsDuplicateRead(x, y);
-        }
-
-        public int GetHashCode(AthleteSplit obj)
-        {
-            return obj.Epc.GetHashCode();
-        }
-
-        private bool IsDuplicateRead(AthleteSplit x, AthleteSplit y)
-        {
-            TimeSpan duration;
-
-            if (x.Time > y.Time)
-            {
-                duration = x.Time - y.Time;
-                return duration.Seconds < 5;
-            }
-            else if (x.Time < y.Time)
-            {
-                duration = y.Time - x.Time;
-                return duration.Seconds < 5;
             }
             else
             {

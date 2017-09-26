@@ -1,19 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using RaceTimer.Business.ViewModel;
 using RaceTimer.Data;
+using System.IO;
+using CsvHelper;
+using RaceTimer.Business.Reports;
+using NLog;
+using System.Collections.Generic;
 
 namespace RaceTimer.Business
 {
     public class AthleteManager : INotifyPropertyChanged
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private readonly AthleteRepository _athleteRepository = new AthleteRepository();
 
         private int _nextBib;
@@ -52,7 +55,7 @@ namespace RaceTimer.Business
             {
                 if (_message != value)
                 {
-                   _message = value;
+                    _message = value;
                     OnPropertyChanged("Message");
                 }
             }
@@ -68,7 +71,7 @@ namespace RaceTimer.Business
         private void AssignTag(Split split)
         {
             Athlete nextAthlete;
-         
+
             //_athleteRepository.GetAll();
 
             if (Athletes.Any())
@@ -108,7 +111,7 @@ namespace RaceTimer.Business
                         Message =
                        $"Tag {split.Epc} assigned to { nextAthlete.Bib}";
                     }
-                    else if (Athletes.Any(x=>x.Bib == NextBib) == false)
+                    else if (Athletes.Any(x => x.Bib == NextBib) == false)
                     {
                         nextAthlete = new Athlete
                         {
@@ -125,7 +128,7 @@ namespace RaceTimer.Business
                         Message =
                        $"Tag {split.Epc} assigned to { nextAthlete.Bib}";
                     }
-                   
+
                     return;
                 }
             }
@@ -147,16 +150,94 @@ namespace RaceTimer.Business
 
                 Application.Current.Dispatcher.Invoke((Action)(() =>
                 {
-                   
+
                     Athletes.Insert(0, nextAthlete);
                 }));
 
                 _athleteRepository.Add(nextAthlete);
                 _athleteRepository.Save();
-               
+
 
                 Message =
                     $"Tag {split.Epc} assigned to {nextAthlete.Bib} with no athlete name";
+            }
+        }
+
+        public void ExportAthletes()
+        {
+
+            try
+            {
+                var athleteList = new List<AthleteCsv>();
+
+                foreach (var ath in Athletes)
+                {
+                    athleteList.Add(
+                        new AthleteCsv
+                        {
+                            Bib = ath.Bib,
+                            FirstName = ath.FirstName,
+                            LastName = ath.LastName,
+                            Gendor = ath.Gendor,
+                            AgeCategory = ath.AgeCategory,
+                            TagId = ath.TagId
+                        }
+                        );
+                }
+
+
+                using (StreamWriter sw = new StreamWriter(
+                    $@"C:\Temp\athletes_{DateTime.Now:yyyy-dd-M--HH-mm-ss}.csv"))
+                {
+                    using (var csvWriter = new CsvWriter(sw))
+                    {
+                        csvWriter.Configuration.HasHeaderRecord = true;
+                        //csvWriter.Configuration.AutoMap<SplitClassMap>();
+                        csvWriter.WriteHeader<AthleteCsv>();
+
+                        csvWriter.WriteRecords(athleteList);
+                        sw.Flush();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error exporting athletes csv " + ex.Message);
+            }
+        }
+
+        public void ImportAthletes(string filePath)
+        {
+            try
+            {
+                using (TextReader fileReader = File.OpenText(filePath))
+                {
+                    var csv = new CsvReader(fileReader);
+                    //csv.Configuration.HasHeaderRecord = false;
+
+                    var records = csv.GetRecords<AthleteCsv>().ToList();
+
+                    foreach (var ath in records)
+                    {
+                        var athlete = new Athlete
+                        {
+                            Bib = ath.Bib,
+                            FirstName = ath.FirstName,
+                            LastName = ath.LastName,
+                            Gendor = ath.Gendor,
+                            AgeCategory = ath.AgeCategory,
+                            TagId = ath.TagId
+                        };
+
+                        _athleteRepository.Add(athlete);
+                        _athleteRepository.Save();
+                        Athletes.Add(athlete);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error importing athletes csv " + ex.Message);
             }
         }
 

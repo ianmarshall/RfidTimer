@@ -7,7 +7,6 @@
              xmlns:business="clr-namespace:RaceTimer.Business;assembly=RaceTimer.Business"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="900">
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -22,14 +21,12 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-
-
         <StackPanel Name="spClockButtons" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="5">
             <Label Width="45" Height="30" Content="Name"></Label>
-            <TextBox Name="rbRaceName" Width="100" Height="20"></TextBox>
-            <Button Name="btnNewRace" IsEnabled="{Binding Connected}"  Content="New Race" Width="60" Height="30" Margin="3" Click="btnNewRace_Click" />
-            <Button Name="btnStartTimer" Content="Start" Width="45" Height="30" Margin="3" Click="btnStartTimer_Click" />
-            <Button Name="btnStopTimer" Content="Finish" Width="45" Margin="3" Height="30" IsEnabled="{Binding Source=ttbCountDown, Path=IsStarted}" Click="btnStopTimer_Click" />
+            <TextBox Name="rbRaceName" Width="120" Height="20" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"></TextBox>
+            <Button Name="btnNewRace" IsEnabled="{Binding Connected}"  Content="New Race" Width="70" Height="40" Margin="5" Click="btnNewRace_Click" />
+            <Button Name="btnStartTimer" Content="Start" Width="60" Height="40" Margin="5" Click="btnStartTimer_Click" />
+            <Button Name="btnStopTimer" Content="Finish" Width="60" Margin="5" Height="40" IsEnabled="{Binding Source=ttbCountDown, Path=IsStarted}" Click="btnStopTimer_Click" />
             <!--<Button Name="btnResetTimer" Content="Reset" Width="40" Margin="3" Click="btnResetTimer_Click" />-->
         </StackPanel>
 
@@ -60,9 +57,5 @@
             </DataGrid.Columns>-->
 
         </DataGrid>
-        <ComboBox Name="cbRaces" ItemsSource="{Binding Races}" 
-                  DisplayMemberPath="Name" 
-                  SelectedValuePath="Name" 
-                  Width="120"/>
     </Grid>
 </UserControl>

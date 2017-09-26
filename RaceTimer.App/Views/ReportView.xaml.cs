@@ -3,6 +3,9 @@ using System.Windows.Controls;
 using RaceTimer.Business;
 using RaceTimer.Data;
 using System.Windows.Forms;
+using System.ComponentModel;
+using System.Collections.Generic;
+using RaceTimer.Business.Reports;
 
 namespace RaceTimer.App.Views
 {
@@ -15,6 +18,7 @@ namespace RaceTimer.App.Views
         private readonly RfidManager _rfidManager;
         private readonly ReportManager _reportManager;
         private Timer timer;
+        private readonly BackgroundWorker worker = new BackgroundWorker();
 
 
 
@@ -33,7 +37,26 @@ namespace RaceTimer.App.Views
             //dgSplits.ItemsSource = _reportManager.Splits;
             //    dgResults.ItemsSource = _reportManager.SplitResults;
             dgResults.DataContext = _reportManager;
+            worker.DoWork += worker_DoWork;
+            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+
         }
+
+        private void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Race race = (Race)e.Argument;
+
+            List<SplitResult> results = _reportManager.LoadResults(race);
+
+            e.Result = results;
+        }
+
+        private void worker_RunWorkerCompleted(object sender,
+                                               RunWorkerCompletedEventArgs e)
+        {
+            dgResults.ItemsSource = (List<SplitResult>)e.Result;
+        }
+
 
         private void cbRaces_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -55,9 +78,7 @@ namespace RaceTimer.App.Views
 
         private void StartReadDelay()
         {
-            
-
-            int delayMiliSeconds = 5 * 1000;
+            int delayMiliSeconds = 10 * 1000;
 
             timer = new Timer();
             timer.Interval = delayMiliSeconds;
@@ -68,14 +89,15 @@ namespace RaceTimer.App.Views
                 //timer.Stop();
                 if (_rfidManager.CurrentRace != null)
                 {
-                    dgResults.ItemsSource = _reportManager.LoadResults(_rfidManager.CurrentRace);
+                    worker.RunWorkerAsync(_rfidManager.CurrentRace);
                 }
             };
 
             timer.Start();
             if (_rfidManager.CurrentRace != null)
             {
-                dgResults.ItemsSource = _reportManager.LoadResults(_rfidManager.CurrentRace);
+                //  dgResults.ItemsSource = _reportManager.LoadResults(_rfidManager.CurrentRace);
+                worker.RunWorkerAsync(_rfidManager.CurrentRace);
             }
         }
 
@@ -86,7 +108,7 @@ namespace RaceTimer.App.Views
 
         private void cbAutoRefresh_Checked(object sender, RoutedEventArgs e)
         {
-            if(cbAutoRefresh.IsChecked.HasValue && cbAutoRefresh.IsChecked.Value)
+            if (cbAutoRefresh.IsChecked.HasValue && cbAutoRefresh.IsChecked.Value)
             {
                 StartReadDelay();
             }

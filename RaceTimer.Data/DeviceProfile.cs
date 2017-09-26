@@ -88,7 +88,7 @@ namespace RaceTimer.Data
         T90s = 90,
     }
 
-    public class ReaderProfile : INotifyPropertyChanged
+    public class ReaderProfile : INotifyPropertyChanged, System.ComponentModel.IDataErrorInfo
     {
         public ReaderProfile()
         {
@@ -163,6 +163,30 @@ namespace RaceTimer.Data
                     _status = value;
                     OnPropertyChanged("Status");
                 }
+            }
+        }
+
+        string IDataErrorInfo.Error
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        string IDataErrorInfo.this[string columnName]
+        {
+            get
+            {
+                switch (columnName)
+                {
+                    case "Name":
+                        if (string.IsNullOrEmpty(Name))
+                            return "Name must be set";
+                        break;
+                }
+
+                return string.Empty;
             }
         }
 

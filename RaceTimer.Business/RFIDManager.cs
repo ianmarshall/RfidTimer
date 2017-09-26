@@ -190,8 +190,10 @@ namespace RaceTimer.Business
         {
             DateTime prevSplit = GetpreviousSplit(split.Epc);
 
-            split.RaceTime = split.DateTimeOfDay.Subtract(CurrentRace.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff");
-            split.SplitTime = split.DateTimeOfDay.Subtract(prevSplit.TimeOfDay).ToString("HH:mm:ss:ff");
+            split.RaceTime = split.DateTimeOfDay.Subtract(CurrentRace.StartDateTime.TimeOfDay).Ticks;
+            split.RaceTime2 = split.DateTimeOfDay.Subtract(CurrentRace.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff");
+
+            split.SplitTime = split.DateTimeOfDay.Subtract(prevSplit.TimeOfDay).TimeOfDay.TotalMilliseconds;
 
             split.RaceId = CurrentRace.Id;
             split.SplitDeviceId = split.SplitDeviceId;
@@ -204,11 +206,10 @@ namespace RaceTimer.Business
 
             var atheleteSplit = new AthleteSplit
             {
-                Position = split.Position,
                 Epc = split.Epc,
                 Time = split.DateTimeOfDay,
-                RaceTime = split.RaceTime,
-                SplitTime = split.SplitTime,
+                RaceTime = TimeSpan.FromTicks(split.RaceTime).ToString("hh':'mm':'ss':'ff"),
+                SplitTime = TimeSpan.FromMilliseconds(split.SplitTime).ToString("hh':'mm':'ss':'ff"),
                 Rssi = split.Rssi,
                 SplitName = split.SplitName,
                 SplitDeviceId = split.SplitDeviceId,
@@ -228,34 +229,15 @@ namespace RaceTimer.Business
                 atheleteSplit.Bib = athlete.Bib;
             }
 
-            logger.Info("Read tag split: {0}", split.ToString());
-
-            if (AthleteSplits.Contains(atheleteSplit))
+            if (split.InventorySearchMode == InventorySearchMode.Session1SingleTarget && AthleteSplits.Contains(atheleteSplit))
             {
+                logger.Info("Suppress tag split: {0}", split.ToString());
                 return;
             }
 
-
+            logger.Info("Read tag split: {0}", split.ToString());
 
             AthleteSplits.Insert(0, atheleteSplit);
-
-
-
-            //var pos = AthleteSplits.Where(x => x.SplitLapCount == splitCount).OrderBy(x => x.Time).ToList();
-            //var count = pos.FindIndex(x => x.Epc == split.Epc);
-
-            //if (count <= 0)
-            //{
-            //    count = 1;
-            //}
-            //else
-            //{
-            //    count = count++;
-            //}
-
-            //split.Position = count;
-            //atheleteSplit.Position = count;
-
 
             _splitRepository.AddSplit(split);
             _splitRepository.Save();

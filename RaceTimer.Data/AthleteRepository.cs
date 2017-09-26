@@ -19,6 +19,14 @@ namespace RaceTimer.Data
             }
             return 0;
         }
+
+
+        public void DeleteAthlete(Athlete athlete)
+        {
+            _entities.Athletes.Attach(athlete);
+            _entities.Athletes.Remove(athlete);
+        }
+
     }
 
     public sealed class Athlete : INotifyPropertyChanged, IEquatable<Athlete>
@@ -64,9 +72,78 @@ namespace RaceTimer.Data
 
         public DateTime ? TagAssignDateTime { get; set; }
 
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+
+        private string _firstName { get; set; }
+        public string FirstName
+        {
+            get { return _firstName; }
+            set
+            {
+                if (_firstName
+                    != value)
+                {
+                    _firstName = value;
+                    OnPropertyChanged("FirstName");
+                }
+            }
+        }
+
+
+        private string _lastName { get; set; }
+        public string LastName
+        {
+            get { return _lastName; }
+            set
+            {
+                if (_lastName
+                    != value)
+                {
+                    _lastName = value;
+                    OnPropertyChanged("LastName");
+                }
+            }
+        }
+
         public DateTime ? Dob { get; set; }
+
+        private Gendor _gendor { get; set; }
+        public Gendor Gendor
+        {
+            get { return _gendor; }
+            set
+            {
+                if (_gendor
+                    != value)
+                {
+                    _gendor = value;
+                    OnPropertyChanged("Gendor");
+                }
+            }
+        }
+
+        [NotMapped]
+        public IList<Gendor> Gendors { get; } = Enum.GetValues(typeof(Gendor)).Cast<Gendor>().ToList();
+
+
+        private AgeCategory _ageCategory { get; set; }
+        public AgeCategory AgeCategory
+        {
+            get { return _ageCategory; }
+            set
+            {
+                if (_ageCategory
+                    != value)
+                {
+                    _ageCategory = value;
+                    OnPropertyChanged("AgeCategory");
+                }
+            }
+        }
+
+        [NotMapped]
+        public IList<AgeCategory> AgeCategories { get; } = Enum.GetValues(typeof(AgeCategory)).Cast<AgeCategory>().ToList();
+
+
         public string Club { get; set; }
 
         public ICollection<Race> Races { get; set; }
@@ -95,5 +172,20 @@ namespace RaceTimer.Data
         {
             return obj.TagId.GetHashCode();
         }
+    }
+
+
+    public enum Gendor
+    {
+        Male,
+        Female
+    }
+
+    public enum AgeCategory
+    {
+        SM,
+        SF,
+        VM,
+        VF
     }
 }

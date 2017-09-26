@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:RaceTimer.App.Views"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
-        Title="Race Timer" Height="650" Width="1200" 
+        Title="Race Timer" Height="850" Width="1200" 
         Closing="Window_Closing">
     <ScrollViewer >
         <Grid>

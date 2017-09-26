@@ -12,8 +12,6 @@ namespace RaceTimer.App.Views
     /// </summary>
     public partial class RaceView : UserControl
     {
-        //   private static Timer _updateTimer = new Timer(UpdateTimer, null, 100, 100);
-        // private static event EventHandler OnTick;
         private DispatcherTimer _timer;
         private TimeSpan _duration;
         private DateTime _startTime;
@@ -31,10 +29,11 @@ namespace RaceTimer.App.Views
             _rfidManager = mainWindow.RfidManager;
             _reportManager = mainWindow.ReportManager;
 
+            _race = new Race();
+
+            rbRaceName.DataContext = _race;
 
             this.DataContext = _rfidManager;
-            cbRaces.DataContext = _reportManager;
-            cbRaces.ItemsSource = _reportManager.Races;
 
             //  btnSetTimer.IsEnabled = _rfidManager.Connected;
 
@@ -65,8 +64,6 @@ namespace RaceTimer.App.Views
 
             this.Show.Text = _raceTime.ToString("HH:mm:ss:ff"); //+ " - " + Convert.ToDateTime(Duration.ToString()).ToString("HH:mm:ss:fff");// DateTime.Now.ToString("HH:mm:ss:ff") + _dateTime;
             // this.Show.Text = String.Format("{0:D2}:{1:D2}", Duration.Seconds, Duration.Milliseconds);
-
-            // Duration.DataContext = Duration;
         }
 
 
@@ -91,8 +88,6 @@ namespace RaceTimer.App.Views
 
             btnStartTimer.IsEnabled = true;
             btnStopTimer.IsEnabled = false;
-            
-
         }
 
         private void btnStartTimer_Click(object sender, RoutedEventArgs e)
@@ -110,7 +105,6 @@ namespace RaceTimer.App.Views
             
             btnStartTimer.IsEnabled = false;
             btnStopTimer.IsEnabled = true;
-
         }
 
         private void btnStopTimer_Click(object sender, RoutedEventArgs e)

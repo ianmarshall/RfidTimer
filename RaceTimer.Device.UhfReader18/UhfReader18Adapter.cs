@@ -112,7 +112,7 @@ namespace RaceTimer.Device.UhfReader18
         public bool BeginReading()
         {
             // Create a timer with a two second interval.
-            _aTimer = new System.Timers.Timer(100);
+            _aTimer = new System.Timers.Timer(200);
             // Hook up the Elapsed event for the timer. 
             _aTimer.Elapsed += TimerTick;
             _aTimer.AutoReset = true;
@@ -278,7 +278,8 @@ namespace RaceTimer.Device.UhfReader18
                         Epc = sEPC,
                        // Rssi = Convert.ToInt32(RSSI, 16).ToString(),
                         SplitName = _readerProfile.Name,
-                        SplitDeviceId = _readerProfile.Id
+                        SplitDeviceId = _readerProfile.Id,
+                        InventorySearchMode = _readerProfile.InventorySearchMode
                     };
 
                     if (_readerProfile.ReadingMode == ReadingMode.Desktop)

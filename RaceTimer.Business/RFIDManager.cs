@@ -31,11 +31,13 @@ namespace RaceTimer.Business
         private readonly SplitRepository _splitRepository = new SplitRepository();
         private readonly ReaderProfileRepository _readerProfileRepository = new ReaderProfileRepository();
         private readonly AthleteRepository _athleteRepository = new AthleteRepository();
+        private readonly SettingsRepository _settingsRepository = new SettingsRepository();
 
         private readonly AthleteManager _athleteManager;
 
         private Dictionary<string, Athlete> _athleteDictionary;
 
+        public Settings Settings { get; set; }
 
         public ObservableCollection<AthleteSplit> AthleteSplits;
 
@@ -46,6 +48,19 @@ namespace RaceTimer.Business
             _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
             _deviceStrategies.Add(ReaderModel.UhfReader18Adapter, new UhfReader18Adapter());
 
+            Settings = _settingsRepository.GetAll().FirstOrDefault();
+
+            if(Settings == null)
+            {
+                Settings = new Settings
+                {
+                    ReadSuppressionTime = 1,
+                    MaxReadUpdateTime = 5,
+                    MinNewReadTime = 30
+                };
+                _settingsRepository.Add(Settings);
+                _settingsRepository.Save();
+            }
 
             AthleteSplits = new ObservableCollection<AthleteSplit>();
             //Enable the cross acces to this collection elsewhere

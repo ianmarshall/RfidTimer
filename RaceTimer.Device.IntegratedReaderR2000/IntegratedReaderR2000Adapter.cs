@@ -244,6 +244,10 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
         private void Inventory()
         {
+            int readSuppressionTime = _readerProfile.Settings.ReadSuppressionTime;
+            int maxReadUpdateTime = _readerProfile.Settings.MaxReadUpdateTime;
+            int minNewReadTime = _readerProfile.Settings.MinNewReadTime;
+
             byte Qvalue = Convert.ToByte(5);
             byte Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
            
@@ -305,6 +309,62 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                     }
                     else
                     {
+
+                        if (RecentTags.ContainsKey(tag.Epc))
+                        {
+                            Split foundTag = null;
+                            foundTag = RecentTags[tag.Epc];
+                            // var nowSeconds = DateTime.Now.yo
+
+                            //  var secondsOld = foundTag(DateTimeOfDay.AddSeconds(- DateTime.Now))
+                           DateTime lastReadTime = foundTag.DateTimeOfDay;
+
+
+
+                            
+                            DateTime rightNow = DateTime.Now;
+
+                            TimeSpan timeSpan = rightNow - lastReadTime;
+
+                            
+
+                            if (timeSpan.Seconds <= readSuppressionTime)
+                            {
+                                //log filter tag
+
+                                //update tag
+                               // RecentTags.TryRemove(tag.Epc, out foundTag);
+                               // RecentTags.TryAdd(tag.Epc, tag);
+                            }
+
+                            if (timeSpan.Seconds > readSuppressionTime && timeSpan.Seconds <= maxReadUpdateTime)
+                            {
+                                //update tag
+                                RecentTags.TryRemove(tag.Epc, out foundTag);
+                                RecentTags.TryAdd(tag.Epc, tag);
+                            }
+
+
+                            if (timeSpan.Seconds > maxReadUpdateTime && timeSpan.Seconds < minNewReadTime)
+                            {
+                                //update tag
+                                RecentTags.TryRemove(tag.Epc, out foundTag);
+                                RecentTags.TryAdd(tag.Epc, tag);
+                            }
+
+
+                            if (timeSpan.Seconds >= minNewReadTime)
+                            {
+                                //update tag
+                                RecentTags.TryRemove(tag.Epc, out foundTag);
+                                RecentTags.TryAdd(tag.Epc, tag);
+                            }
+                        }
+                        else
+                        {
+                            RecentTags.TryAdd(tag.Epc, tag);
+                        }
+                            
                         onRecordTag(tag);
                     }
                 }

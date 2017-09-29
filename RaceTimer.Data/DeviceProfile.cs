@@ -13,6 +13,7 @@ namespace RaceTimer.Data
         public RaceTimerContext() : base("name=RaceTimerDatabase")
         {
         }
+        public DbSet<Settings> Settings { get; set; }
         public DbSet<ReaderProfile> ReaderProfiles { get; set; }
         public DbSet<Split> Splits { get; set; }
         public DbSet<Athlete> Athletes { get; set; }
@@ -165,6 +166,11 @@ namespace RaceTimer.Data
                 }
             }
         }
+
+        public int SettingsId { get; set; }
+
+        //[ForeignKey("SettingsId")]
+        public virtual Settings Settings { get; set; }
 
         string IDataErrorInfo.Error
         {

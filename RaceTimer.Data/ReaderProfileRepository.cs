@@ -2,8 +2,8 @@
 
 namespace RaceTimer.Data
 {
-    public class ReaderProfileRepository : BaseRepository<RaceTimerContext,ReaderProfile>
+    public class ReaderProfileRepository : BaseRepository<ReaderProfile>
     {
-       
+      
     }
 }

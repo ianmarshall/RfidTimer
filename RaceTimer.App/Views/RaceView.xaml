@@ -26,7 +26,7 @@
             <TextBox Name="rbRaceName" Width="120" Height="20" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"></TextBox>
             <Button Name="btnNewRace" IsEnabled="{Binding Connected}"  Content="New Race" Width="70" Height="40" Margin="5" Click="btnNewRace_Click" />
             <Button Name="btnStartTimer" Content="Start" Width="60" Height="40" Margin="5" Click="btnStartTimer_Click" />
-            <Button Name="btnStopTimer" Content="Finish" Width="60" Margin="5" Height="40" IsEnabled="{Binding Source=ttbCountDown, Path=IsStarted}" Click="btnStopTimer_Click" />
+            <Button Name="btnStopTimer" Content="Finish" Width="60" Margin="3" Height="40" IsEnabled="{Binding Source=ttbCountDown, Path=IsStarted}" Click="btnStopTimer_Click" />
             <!--<Button Name="btnResetTimer" Content="Reset" Width="40" Margin="3" Click="btnResetTimer_Click" />-->
         </StackPanel>
 

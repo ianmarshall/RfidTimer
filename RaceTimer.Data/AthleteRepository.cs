@@ -9,13 +9,13 @@ using System.Text;
 
 namespace RaceTimer.Data
 {
-    public class AthleteRepository : BaseRepository<RaceTimerContext, Athlete>
+    public class AthleteRepository : BaseRepository<Athlete>
     {
         public int GetMaxBib()
         {
-            if (_entities.Athletes.Any())
+            if (Context.Athletes.Any())
             {
-                return _entities.Athletes.Max(x => x.Bib);
+                return Context.Athletes.Max(x => x.Bib);
             }
             return 0;
         }
@@ -23,8 +23,8 @@ namespace RaceTimer.Data
 
         public void DeleteAthlete(Athlete athlete)
         {
-            _entities.Athletes.Attach(athlete);
-            _entities.Athletes.Remove(athlete);
+            Context.Athletes.Attach(athlete);
+            Context.Athletes.Remove(athlete);
         }
 
     }

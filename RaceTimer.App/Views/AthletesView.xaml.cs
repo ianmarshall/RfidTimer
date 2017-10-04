@@ -10,7 +10,7 @@ using System.Linq;
 namespace RaceTimer.App.Views
 {
     /// <summary>
-    /// Interaction logic for AthletesView.xaml
+    /// Interaction logic for AthletesView.xaml 
     /// </summary>
     public partial class AthletesView : UserControl
     {

@@ -20,6 +20,8 @@
         <ComboBox x:Name="cbAgeCat"  SelectedValue="{Binding AgeCategory, Mode=TwoWay}" ItemsSource="{Binding AgeCategories}" HorizontalAlignment="Left" Margin="93,144,0,0" VerticalAlignment="Top" Width="120"/>
         <Label x:Name="label4" Content="Tag Id" HorizontalAlignment="Left" Margin="28,187,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="tbTagId" Text="{Binding TagId}" HorizontalAlignment="Left" Height="23" Margin="93,190,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="242"/>
+        <DatePicker Name="dpDOB" SelectedDate="{Binding Dob, Mode=TwoWay}" HorizontalAlignment="Left" Margin="295,142,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label5" Content="DOB" HorizontalAlignment="Left" Margin="234,141,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

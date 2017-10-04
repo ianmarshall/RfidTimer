@@ -15,6 +15,8 @@ namespace RaceTimer.Data
     {
         public int Id { get; set; }
 
+        public bool TestMode { get; set; }
+
         public StartReadDelay StartReadDelay { get; set; }
 
         public int ReadSuppressionTime { get; set;}

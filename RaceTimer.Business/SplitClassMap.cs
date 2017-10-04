@@ -12,7 +12,6 @@ namespace RaceTimer.Business
     {
         public SplitClassMap()
         {
-
             Map(m => m.Id).Name("Id");
             Map(m => m.AthleteName).Name("Athlete");
         }

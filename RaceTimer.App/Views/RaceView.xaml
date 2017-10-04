@@ -27,7 +27,9 @@
             <Button Name="btnNewRace" IsEnabled="{Binding Connected}"  Content="New Race" Width="70" Height="40" Margin="5" Click="btnNewRace_Click" />
             <Button Name="btnStartTimer" Content="Start" Width="60" Height="40" Margin="5" Click="btnStartTimer_Click" />
             <Button Name="btnStopTimer" Content="Finish" Width="60" Margin="3" Height="40" IsEnabled="{Binding Source=ttbCountDown, Path=IsStarted}" Click="btnStopTimer_Click" />
-            <!--<Button Name="btnResetTimer" Content="Reset" Width="40" Margin="3" Click="btnResetTimer_Click" />-->
+            <Button Name="btnResetTimer" Content="Panic split" Width="60" Margin="3" />
+            <TextBox Name="tbBib" Width="50" Height="30" />
+            
         </StackPanel>
 
         <Border Grid.Row="2" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" CornerRadius="8" HorizontalAlignment="Center" Background="LightGray" Margin="5">
@@ -57,5 +59,6 @@
             </DataGrid.Columns>-->
 
         </DataGrid>
+        
     </Grid>
 </UserControl>

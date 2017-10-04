@@ -19,7 +19,7 @@ namespace RaceTimer.Business
     public class RfidManager : INotifyPropertyChanged
     {
         //lock object for synchronization;
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private IEnumerable<ReaderProfile> _readerProfiles;
         private readonly object _syncLock = new object();
         private bool _connected;

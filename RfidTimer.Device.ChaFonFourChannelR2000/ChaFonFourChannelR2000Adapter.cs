@@ -33,6 +33,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         private double fdmaxfre;
         private int fCmdRet = 30; //所有执行指令的返回值
         private bool fisinventoryscan_6B;
+        private int FrmPortIndex;
         private byte[] fOperEPC = new byte[100];
         private byte[] fPassWord = new byte[4];
         private byte[] fOperID_6B = new byte[10];
@@ -75,6 +76,12 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         public bool BeginReading()
         {
+            //       SetSettings();
+            //
+            //   fCmdRet = RWDev.OpenNetPort(nPort, ipAddress, ref fComAdr, ref FrmPortIndex);
+
+            fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
+
             // Create a timer with a two second interval.
             _aTimer = new System.Timers.Timer(100);
             // Hook up the Elapsed event for the timer. 
@@ -93,30 +100,59 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             //if (fIsInventoryScan)
             //    return;
 
+            //GetData();
+            flash_G2();
 
-            Inventory();
+            //  Inventory();
         }
 
         public bool CloseConnection()
         {
-            try
+            if (_readerProfile.ConnectionType == ConnectionType.Serial)
             {
-                RWDev.CloseSpecComPort((int)_readerProfile.ComPort);
+
+                try
+                {
+                    RWDev.CloseSpecComPort((int)_readerProfile.ComPort);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                return false;
+            }
+            else
+            {
+                fCmdRet = RWDev.CloseNetPort(FrmPortIndex);
                 return true;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            return false;
+
         }
 
         public bool OpenConnection()
         {
+            if (_readerProfile.ConnectionType == ConnectionType.Serial)
+            {
+                return OpenSerial();
+
+            }
+            else
+            {
+                return OpenEthernet();
+            }
+
+
+        }
+
+        private bool OpenSerial()
+        {
             try
             {
-                int portNum = (int) _readerProfile.ComPort;
-                int FrmPortIndex = 0;
+
+
+                int portNum = (int)_readerProfile.ComPort;
+                FrmPortIndex = 0;
                 string strException = string.Empty;
                 fBaud = Convert.ToByte(3);
                 if (fBaud > 2)
@@ -132,6 +168,9 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                 else
                 {
                     frmcomportindex = FrmPortIndex;
+
+                    //   fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
+
                     string strLog = "Connect: "; // + ComboBox_COM.Text + "@" + ComboBox_baud2.Text;
                     //  WriteLog(lrtxtLog, strLog, 0);
                     return true;
@@ -146,6 +185,30 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             return false;
         }
 
+        private bool OpenEthernet()
+        {
+
+
+            string strException = string.Empty;
+            string ipAddress = _readerProfile.IpAddress;
+            int nPort = Convert.ToInt32("27011");
+            fComAdr = 255;
+            FrmPortIndex = 0;
+            fCmdRet = RWDev.OpenNetPort(nPort, ipAddress, ref fComAdr, ref FrmPortIndex);
+            if (fCmdRet != 0)
+            {
+                string strLog = "Connect reader failed: " + GetReturnCodeDesc(fCmdRet);
+                MessageBox.Show(strLog);
+                return false;
+            }
+            else
+            {
+                frmcomportindex = FrmPortIndex;
+                string strLog = "Connect: " + ipAddress + "@" + nPort.ToString();
+                return true;
+            }
+        }
+
         public bool StopReading()
         {
             _aTimer.Enabled = false;
@@ -156,11 +219,279 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         public event EventHandler<EventArgs> OnAssignTag;
 
-        private void Inventory()
+        private void SetSettings()
+        {
+            byte[] Parameter = new byte[200];
+            byte MaskMem = 0;
+            byte[] MaskAdr = new byte[2];
+            byte MaskLen = 0;
+            byte[] MaskData = new byte[200];
+            byte MaskFlag = 0;
+            byte AdrTID = 0;
+            byte LenTID = 0;
+            byte TIDFlag = 0;
+            //if (MRB_G2.Checked)
+            //{
+            //    Parameter[0] = 0;
+            //}
+            //else
+            //{
+            //    Parameter[0] = 1;
+            //}
+
+            Parameter[0] = 1;
+
+            Parameter[1] = (byte)0;//COM_MRPTime.SelectedIndex;
+            Parameter[2] = (byte)0; //com_MFliterTime.SelectedIndex;
+            Parameter[3] = (byte)4;//com_MQ.SelectedIndex;
+            Parameter[4] = (byte)0;//com_MS.SelectedIndex;
+            if (Parameter[4] > 3) Parameter[4] = 255;
+            //if (checkBox_mask.Checked)
+            //{
+            //    if (RBM_EPC.Checked)
+            //    {
+            //        MaskMem = 1;
+            //    }
+            //    else if (RBM_TID.Checked)
+            //    {
+            //        MaskMem = 2;
+            //    }
+            //    else if (RBM_USER.Checked)
+            //    {
+            //        MaskMem = 3;
+            //    }
+            //    if ((txt_Maddr.Text.Length != 4) || (txt_Mlen.Text.Length != 2) || (txt_Mdata.Text.Length % 2 != 0))
+            //    {
+            //        MessageBox.Show("Mask error!", "information");
+            //        return;
+            //    }
+            //    MaskAdr = HexStringToByteArray(txt_Maddr.Text);
+            //    int len = Convert.ToInt32(txt_Mlen.Text, 16);
+            //    MaskLen = (byte)len;
+            //    MaskData = HexStringToByteArray(txt_Mdata.Text);
+            //    MaskFlag = 1;
+            //}
+            //if (checkBox_tid.Checked)
+            //{
+            //    AdrTID = Convert.ToByte(txt_mtidaddr.Text, 16);
+            //    LenTID = Convert.ToByte(txt_Mtidlen.Text, 16);
+            //    TIDFlag = 1;
+            //}
+            fCmdRet = RWDev.SetReadParameter(ref fComAdr, Parameter, MaskMem, MaskAdr, MaskLen, MaskData, MaskFlag, AdrTID, LenTID, TIDFlag, frmcomportindex);
+            if (fCmdRet != 0)
+            {
+                string strLog = "Set read parameter failed: " + GetReturnCodeDesc(fCmdRet);
+                // WriteLog(lrtxtLog, strLog, 1);
+            }
+            else
+            {
+                string strLog = "Set read parameter success ";
+                // WriteLog(lrtxtLog, strLog, 0);
+            }
+        }
+
+        //private void Inventory()
+        //{
+        //    Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
+        //    byte Ant = 0;
+        //    int TagNum = 0;
+        //    int Totallen = 0;
+        //    int EPClen, m;
+        //    byte[] EPC = new byte[50000];
+        //    int CardIndex;
+        //    string temps, temp;
+        //    temp = "";
+        //    string sEPC;
+        //    byte MaskMem = 0;
+        //    byte[] MaskAdr = new byte[2];
+        //    byte MaskLen = 0;
+        //    byte[] MaskData = new byte[100];
+        //    byte MaskFlag = 0;
+        //    byte AdrTID = 0;
+        //    byte LenTID = 0;
+        //    AdrTID = 0;
+        //    LenTID = 6;
+        //    MaskFlag = 0;
+        //    int cbtime = System.Environment.TickCount;
+        //    CardNum = 0;
+        //    fCmdRet = RWDev.Inventory_G2(ref fComAdr, Qvalue, Session, MaskMem, MaskAdr, MaskLen, MaskData, MaskFlag, AdrTID, LenTID, TIDFlag, Target, InAnt, Scantime, FastFlag, EPC, ref Ant, ref Totallen, ref TagNum, frmcomportindex);
+        //    int cmdTime = System.Environment.TickCount - cbtime;//命令时间
+
+        //    if (fCmdRet == 0x30)
+        //    {
+        //        CardNum = 0;
+        //    }
+        //    if (CardNum == 0)
+        //    {
+        //        if (Session > 1)
+        //            AA_times = AA_times + 1;//没有得到标签只更新状态栏
+        //    }
+        //    else
+        //        AA_times = 0;
+        //    if ((fCmdRet == 1) || (fCmdRet == 2) || (fCmdRet == 0xFB) || (fCmdRet == 0x26))
+        //    {
+        //        if (cmdTime > CommunicationTime)
+        //            cmdTime = cmdTime - CommunicationTime;//减去通讯时间等于标签的实际时间
+        //        if (cmdTime > 0)
+        //        {
+        //            int tagrate = (CardNum * 1000) / cmdTime;//速度等于张数/时间
+        //            IntPtr ptrWnd = IntPtr.Zero;
+        //            //ptrWnd = FindWindow(null, "UHFReader288 Demo V2.0");
+        //            //if (ptrWnd != IntPtr.Zero)         // 检查当前统计窗口是否打开
+        //            //{
+        //            //    string para = tagrate.ToString() + "," + total_tagnum.ToString() + "," + cmdTime.ToString();
+        //            //    SendMessage(ptrWnd, WM_SENDTAGSTAT, IntPtr.Zero, para);
+        //            //}
+        //        }
+
+        //    }
+        //    IntPtr ptrWnd1 = IntPtr.Zero;
+        //    //ptrWnd1 = FindWindow(null, "UHFReader288 Demo V2.0");
+        //    //if (ptrWnd1 != IntPtr.Zero)         // 检查当前统计窗口是否打开
+        //    //{
+        //    //    string para = fCmdRet.ToString();
+        //    //    SendMessage(ptrWnd1, WM_SENDSTATU, IntPtr.Zero, para);
+        //    //}
+        //    ptrWnd1 = IntPtr.Zero;
+        //}
+
+
+        private void GetData()
+        {
+            byte[] ScanModeData = new byte[40960];
+            int nLen, NumLen;
+            string temp1 = "";
+            string syear = "";
+            string smonth = "";
+            string sday = "";
+            string shour = "";
+            string smin = "";
+            string ssec = "";
+            string Lyear = "";
+            string Lmonth = "";
+            string Lday = "";
+            string Lhour = "";
+            string Lmin = "";
+            string Lsec = "";
+            string binarystr1 = "";
+            string binarystr2 = "";
+            string CountStr = "";
+            string AntStr = "";
+            string EPCStr = "";
+            int ValidDatalength;
+            string temp;
+            ValidDatalength = 0;
+            DataGridViewRow rows = new DataGridViewRow();
+            int xtime = System.Environment.TickCount;
+            fCmdRet = RWDev.ReadActiveModeData(ScanModeData, ref ValidDatalength, frmcomportindex);
+            if (fCmdRet == 0)
+            {
+                try
+                {
+                    byte[] daw = new byte[ValidDatalength];
+                    Array.Copy(ScanModeData, 0, daw, 0, ValidDatalength);
+                    temp = ByteArrayToHexString(daw);
+                    fInventory_EPC_List = fInventory_EPC_List + temp;//把字符串存进列表
+                    nLen = fInventory_EPC_List.Length;
+                    while (fInventory_EPC_List.Length > 34)
+                    {
+                        string FlagStr = Convert.ToString(fComAdr, 16).PadLeft(2, '0') + "EE00";//查找头位置标志字符串
+                        int nindex = fInventory_EPC_List.IndexOf(FlagStr);
+                        if (nindex > 1)
+                            fInventory_EPC_List = fInventory_EPC_List.Substring(nindex - 2);
+                        else
+                        {
+                            fInventory_EPC_List = fInventory_EPC_List.Substring(2);
+                            continue;
+                        }
+                        NumLen = Convert.ToInt32(fInventory_EPC_List.Substring(0, 2), 16) * 2 + 2;//取第一个帧的长度
+                        if (fInventory_EPC_List.Length < NumLen)
+                        {
+                            break;
+                        }
+                        temp1 = fInventory_EPC_List.Substring(0, NumLen);
+                        fInventory_EPC_List = fInventory_EPC_List.Substring(NumLen);
+                        if (!CheckCRC(temp1)) continue;
+                        binarystr1 = Convert.ToString(Convert.ToInt32(temp1.Substring(8, 8), 16), 2).PadLeft(32, '0');
+                        syear = Convert.ToString(Convert.ToInt32(binarystr1.Substring(0, 6), 2)).PadLeft(2, '0');
+                        smonth = Convert.ToString(Convert.ToInt32(binarystr1.Substring(6, 4), 2)).PadLeft(2, '0');
+                        sday = Convert.ToString(Convert.ToInt32(binarystr1.Substring(10, 5), 2)).PadLeft(2, '0');
+                        shour = Convert.ToString(Convert.ToInt32(binarystr1.Substring(15, 5), 2)).PadLeft(2, '0');
+                        smin = Convert.ToString(Convert.ToInt32(binarystr1.Substring(20, 6), 2)).PadLeft(2, '0');
+                        ssec = Convert.ToString(Convert.ToInt32(binarystr1.Substring(26, 6), 2)).PadLeft(2, '0');
+
+                        binarystr2 = Convert.ToString(Convert.ToInt32(temp1.Substring(16, 8), 16), 2).PadLeft(32, '0');
+                        Lyear = Convert.ToString(Convert.ToInt32(binarystr2.Substring(0, 6), 2)).PadLeft(2, '0');
+                        Lmonth = Convert.ToString(Convert.ToInt32(binarystr2.Substring(6, 4), 2)).PadLeft(2, '0');
+                        Lday = Convert.ToString(Convert.ToInt32(binarystr2.Substring(10, 5), 2)).PadLeft(2, '0');
+                        Lhour = Convert.ToString(Convert.ToInt32(binarystr2.Substring(15, 5), 2)).PadLeft(2, '0');
+                        Lmin = Convert.ToString(Convert.ToInt32(binarystr2.Substring(20, 6), 2)).PadLeft(2, '0');
+                        Lsec = Convert.ToString(Convert.ToInt32(binarystr2.Substring(26, 6), 2)).PadLeft(2, '0');
+
+                        CountStr = Convert.ToString(Convert.ToInt32(temp1.Substring(24, 4), 16), 10);
+                        AntStr = Convert.ToString(Convert.ToInt32(temp1.Substring(28, 2), 16), 2).PadLeft(4, '0');
+                        EPCStr = temp1.Substring(30, temp1.Length - 34);
+
+                        var readTime = DateTime.Now;
+
+                        var tag = new Split
+                        {
+                            DateTimeOfDay = readTime,
+                            TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
+                            Epc = EPCStr,
+                            //  Rssi = Convert.ToInt32(RSSI, 16).ToString(),
+                            SplitName = _readerProfile.Name,
+                            SplitDeviceId = _readerProfile.Id,
+                            InventorySearchMode = _readerProfile.InventorySearchMode
+                        };
+                        onRecordTag(tag);
+
+                        bool isonlistview = false;
+                        //for (int i = 0; i < dataGridView2.RowCount; i++)
+                        //{
+                        //    if ((dataGridView2.Rows[i].Cells[1].Value != null) && (EPCStr == dataGridView2.Rows[i].Cells[1].Value.ToString()))
+                        //    {
+                        //        rows = dataGridView2.Rows[i];
+                        //        rows.Cells[3].Value = "20" + Lyear + "-" + Lmonth + "-" + Lday + " " + Lhour + ":" + Lmin + ":" + Lsec; ;
+                        //        rows.Cells[4].Value = AntStr;
+                        //        rows.Cells[5].Value = CountStr;
+                        //        isonlistview = true;
+                        //        break;
+                        //    }
+                        //}
+                        if (!isonlistview)
+                        {
+                            //string[] arr = new string[6];
+                            //arr[0] = (dataGridView2.RowCount + 1).ToString();
+                            //arr[1] = EPCStr;
+                            //arr[2] = "20" + syear + "-" + smonth + "-" + sday + " " + shour + ":" + smin + ":" + ssec;
+                            //arr[3] = "20" + Lyear + "-" + Lmonth + "-" + Lday + " " + Lhour + ":" + Lmin + ":" + Lsec;
+                            //arr[4] = AntStr;
+                            //arr[5] = CountStr;
+                            //dataGridView2.Rows.Insert(dataGridView2.RowCount, arr);
+                        }
+                        total_tagnum = total_tagnum + 1;////每解析一条记录加一
+                        //lxLed_toltag.Text = total_tagnum.ToString();
+                        //lxLed_toltime.Text = (System.Environment.TickCount - total_time).ToString();
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    ex.ToString();
+                }
+            }
+            xtime = System.Environment.TickCount - xtime;
+            //lxLed_Num.Text = dataGridView2.RowCount.ToString();
+            //if ((System.Environment.TickCount - total_time) > 0)
+            //    lxLed_cmdsud.Text = (total_tagnum * 1000 / (System.Environment.TickCount - total_time)).ToString();
+        }
+
+        private void flash_G2()
         {
             Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
+            Qvalue = Convert.ToByte(4);
             byte Ant = 0;
-            int TagNum = 0;
+            int CardNum = 0;
             int Totallen = 0;
             int EPClen, m;
             byte[] EPC = new byte[50000];
@@ -180,45 +511,207 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             MaskFlag = 0;
             int cbtime = System.Environment.TickCount;
             CardNum = 0;
-            fCmdRet = RWDev.Inventory_G2(ref fComAdr, Qvalue, Session, MaskMem, MaskAdr, MaskLen, MaskData, MaskFlag, AdrTID, LenTID, TIDFlag, Target, InAnt, Scantime, FastFlag, EPC, ref Ant, ref Totallen, ref TagNum, frmcomportindex);
+            fCmdRet = RWDev.Inventory_G2(ref fComAdr, Qvalue, Session, MaskMem, MaskAdr, MaskLen, MaskData, MaskFlag, AdrTID, LenTID, TIDFlag, Target, InAnt, Scantime, FastFlag, EPC, ref Ant, ref Totallen, ref CardNum, frmcomportindex);
             int cmdTime = System.Environment.TickCount - cbtime;//命令时间
-            
-            if (fCmdRet == 0x30)
+            if ((fCmdRet == 0x30) || (fCmdRet == 0x37))
             {
-                CardNum = 0;
+                if (_readerProfile.ConnectionType == ConnectionType.Ethernet)
+                {
+                    if (frmcomportindex > 1023)
+                    {
+                        fCmdRet = RWDev.CloseNetPort(frmcomportindex);
+                        if (fCmdRet == 0) frmcomportindex = -1;
+                        Thread.Sleep(1000);
+                    }
+                    fComAdr = 255;
+                    string ipAddress = _readerProfile.IpAddress;
+                    int nPort = Convert.ToInt32("27011");
+                    fCmdRet = RWDev.OpenNetPort(nPort, ipAddress, ref fComAdr, ref frmcomportindex);
+                }
             }
             if (CardNum == 0)
             {
                 if (Session > 1)
                     AA_times = AA_times + 1;//没有得到标签只更新状态栏
+                IntPtr ptrWnd = IntPtr.Zero;
+                // ptrWnd = FindWindow(null, "UHFReader288 Demo V1.16");
+                if (ptrWnd != IntPtr.Zero)         // 检查当前统计窗口是否打开
+                {
+                    string para = fCmdRet.ToString();
+                    //  SendMessage(ptrWnd, WM_SENDSTATU, IntPtr.Zero, para);
+                }
+                return;
+            }
+            AA_times = 0;
+
+            if ((fCmdRet == 1) || (fCmdRet == 2) || (fCmdRet == 0x26)) //代表已查找结束，
+            {
+                byte[] daw = new byte[Totallen];
+                Array.Copy(EPC, daw, Totallen);
+                temps = ByteArrayToHexString(daw);
+                if (fCmdRet == 0x26)
+                {
+                    string SDCMD = temps.Substring(0, 12);
+                    temps = temps.Substring(12);
+                    daw = HexStringToByteArray(temps);
+                    byte[] datas = new byte[6];
+                    datas = HexStringToByteArray(SDCMD);
+                    int tagrate = datas[0] * 256 + datas[1];
+                    int tagnum = datas[2] * 256 * 256 * 256 + datas[3] * 256 * 256 + datas[4] * 256 + datas[5];
+                    total_tagnum = total_tagnum + tagnum;
+                    IntPtr ptrWnd = IntPtr.Zero;
+                    // ptrWnd = FindWindow(null, "UHFReader288 Demo V1.16");
+                    if (ptrWnd != IntPtr.Zero) // 检查当前统计窗口是否打开
+                    {
+                        string para = tagrate.ToString() + "," + total_tagnum.ToString() + "," + cmdTime.ToString();
+                        //   SendMessage(ptrWnd, WM_SENDTAGSTAT, IntPtr.Zero, para);
+                    }
+                }
+                m = 0;
+                for (CardIndex = 0; CardIndex < CardNum; CardIndex++)
+                {
+                    EPClen = daw[m] + 1;
+                    temp = temps.Substring(m * 2 + 2, EPClen * 2);
+                    sEPC = temp.Substring(0, temp.Length - 2);
+                    string RSSI = Convert.ToInt32(temp.Substring(temp.Length - 2, 2), 16).ToString();
+                    m = m + EPClen + 1;
+                    if (sEPC.Length != (EPClen - 1) * 2)
+                    {
+                        return;
+                    }
+                    IntPtr ptrWnd = IntPtr.Zero;
+                    //  ptrWnd = FindWindow(null, "UHFReader288 Demo V1.16");
+                    if (ptrWnd != IntPtr.Zero) // 检查当前统计窗口是否打开
+                    {
+                        string para = sEPC + "," + RSSI.ToString() + " ";
+                        //   SendMessage(ptrWnd, WM_SENDTAG, IntPtr.Zero, para);
+                    }
+                    var readTime = DateTime.Now;
+
+                    var tag = new Split
+                    {
+                        DateTimeOfDay = readTime,
+                        TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
+                        Epc = sEPC,
+                        //  Rssi = Convert.ToInt32(RSSI, 16).ToString(),
+                        SplitName = _readerProfile.Name,
+                        SplitDeviceId = _readerProfile.Id,
+                        InventorySearchMode = _readerProfile.InventorySearchMode
+                    };
+
+                    string epcDateTime;
+
+                    if (RecentTags.ContainsKey(sEPC))
+                    {
+                        Split tag1 = RecentTags[sEPC];
+                        //convert string to dt
+
+                        //  ltrt = Convert.ToDateTime(epcDateTime);
+                        //	  Console.WriteLine("Tag last seen at "+ epcDateTime);
+                    }
+
+                    else
+                    {
+                        RecentTags.TryAdd(sEPC, tag);
+                    }
+
+
+                    //  onRecordTag(tag);
+                }
+            }
+
+            DateTime currentTime = DateTime.Now.ToLocalTime();
+
+            foreach (KeyValuePair<string, Split> recentTag in RecentTags)
+            {
+                TimeSpan difference = currentTime - recentTag.Value.DateTimeOfDay;
+
+                if (difference.TotalSeconds >= 3)
+                {
+                    Split removedTag;
+                    RecentTags.TryRemove(recentTag.Key, out removedTag);
+
+                    onRecordTag(removedTag);
+                }
+            }
+            //if ((fCmdRet == 1) || (fCmdRet == 2) || (fCmdRet == 0xFB))
+            //{
+            //    if (cmdTime > CommunicationTime)
+            //        cmdTime = cmdTime - CommunicationTime;//减去通讯时间等于标签的实际时间
+            //    int tagrate = (CardNum * 1000) / cmdTime;//速度等于张数/时间
+            //    total_tagnum = total_tagnum + CardNum;
+            //    IntPtr ptrWnd = IntPtr.Zero;
+            //    ptrWnd = FindWindow(null, "UHFReader288 Demo V1.16");
+            //    if (ptrWnd != IntPtr.Zero)         // 检查当前统计窗口是否打开
+            //    {
+            //        string para = tagrate.ToString() + "," + total_tagnum.ToString() + "," + cmdTime.ToString();
+            //        SendMessage(ptrWnd, WM_SENDTAGSTAT, IntPtr.Zero, para);
+            //    }
+            //}
+            //else if (fCmdRet != 0x26)
+            //{
+            //    IntPtr ptrWnd1 = IntPtr.Zero;
+            //    ptrWnd1 = FindWindow(null, "UHFReader288 Demo V1.16");
+            //    if (ptrWnd1 != IntPtr.Zero)         // 检查当前统计窗口是否打开
+            //    {
+            //        string para = fCmdRet.ToString();
+            //        SendMessage(ptrWnd1, WM_SENDSTATU, IntPtr.Zero, para);
+            //    }
+            //}
+        }
+
+        private void onRecordTag(EventArgs e)
+        {
+            OnRecordTag?.Invoke(this, e);
+        }
+
+        public static string ByteArrayToHexString(byte[] data)
+        {
+            StringBuilder sb = new StringBuilder(data.Length * 3);
+            foreach (byte b in data)
+                sb.Append(Convert.ToString(b, 16).PadLeft(2, '0'));
+            return sb.ToString().ToUpper();
+
+        }
+
+        public static byte[] HexStringToByteArray(string s)
+        {
+            s = s.Replace(" ", "");
+            byte[] buffer = new byte[s.Length / 2];
+            for (int i = 0; i < s.Length; i += 2)
+                buffer[i / 2] = (byte)Convert.ToByte(s.Substring(i, 2), 16);
+            return buffer;
+        }
+
+        private bool CheckCRC(string s)
+        {
+            int i, j;
+            int current_crc_value;
+            byte crcL, crcH;
+            byte[] data = HexStringToByteArray(s);
+            current_crc_value = 0xFFFF;
+            for (i = 0; i <= (data.Length - 1); i++)
+            {
+                current_crc_value = current_crc_value ^ (data[i]);
+                for (j = 0; j < 8; j++)
+                {
+                    if ((current_crc_value & 0x01) != 0)
+                        current_crc_value = (current_crc_value >> 1) ^ 0x8408;
+                    else
+                        current_crc_value = (current_crc_value >> 1);
+                }
+            }
+            crcL = Convert.ToByte(current_crc_value & 0xFF);
+            crcH = Convert.ToByte((current_crc_value >> 8) & 0xFF);
+            if (crcH == 0 && crcL == 0)
+            {
+                return true;
             }
             else
-                AA_times = 0;
-            if ((fCmdRet == 1) || (fCmdRet == 2) || (fCmdRet == 0xFB) || (fCmdRet == 0x26))
             {
-                if (cmdTime > CommunicationTime)
-                    cmdTime = cmdTime - CommunicationTime;//减去通讯时间等于标签的实际时间
-                if (cmdTime > 0)
-                {
-                    int tagrate = (CardNum * 1000) / cmdTime;//速度等于张数/时间
-                    IntPtr ptrWnd = IntPtr.Zero;
-                    //ptrWnd = FindWindow(null, "UHFReader288 Demo V2.0");
-                    //if (ptrWnd != IntPtr.Zero)         // 检查当前统计窗口是否打开
-                    //{
-                    //    string para = tagrate.ToString() + "," + total_tagnum.ToString() + "," + cmdTime.ToString();
-                    //    SendMessage(ptrWnd, WM_SENDTAGSTAT, IntPtr.Zero, para);
-                    //}
-                }
-
+                return false;
             }
-            IntPtr ptrWnd1 = IntPtr.Zero;
-            //ptrWnd1 = FindWindow(null, "UHFReader288 Demo V2.0");
-            //if (ptrWnd1 != IntPtr.Zero)         // 检查当前统计窗口是否打开
-            //{
-            //    string para = fCmdRet.ToString();
-            //    SendMessage(ptrWnd1, WM_SENDSTATU, IntPtr.Zero, para);
-            //}
-            ptrWnd1 = IntPtr.Zero;
+
         }
 
         //private void inventory()

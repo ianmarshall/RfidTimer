@@ -7,7 +7,7 @@ using System.Text;
 
 namespace RaceTimer.Data
 {
-    public class RaceRepository : BaseRepository<Race>
+    public class RaceRepository : BaseRepository<RaceTimerContext,Race>
     {
         
     }

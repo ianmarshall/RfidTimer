@@ -60,6 +60,12 @@
                                 <Label Content="Model"
                                        HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                 <ComboBox  SelectedValue="{Binding Model, Mode=TwoWay}" ItemsSource="{Binding Models}"/>
+                                <Label Content="Connection"></Label>
+                                <!--<RadioButton GroupName="Connect" Content="Com" IsChecked="True"  HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                <RadioButton GroupName="Connect" Content="IP/TCP" HorizontalAlignment="Left" VerticalAlignment="Top" />-->
+                                <ComboBox  SelectedValue="{Binding ConnectionType, Mode=TwoWay}" ItemsSource="{Binding ConnectionTypes}"/>
+                                <Label Content="IP Address"></Label>
+                                <TextBox Text="{Binding IpAddress, Mode=TwoWay}"></TextBox>
                                 <Label Content="Com Port"></Label>
                                 <ComboBox  SelectedValue="{Binding ComPort, Mode=TwoWay}" ItemsSource="{Binding ComPorts}"/>
 

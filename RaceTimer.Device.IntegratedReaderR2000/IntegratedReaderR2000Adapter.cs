@@ -244,9 +244,9 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
         private void Inventory()
         {
-            int readSuppressionTime = _readerProfile.Settings.ReadSuppressionTime;
-            int maxReadUpdateTime = _readerProfile.Settings.MaxReadUpdateTime;
-            int minNewReadTime = _readerProfile.Settings.MinNewReadTime;
+           int readSuppressionTime = 1; // = _readerProfile.Settings.ReadSuppressionTime;
+           int maxReadUpdateTime = 1; // = _readerProfile.Settings.MaxReadUpdateTime;
+            int minNewReadTime = 1; // = _readerProfile.Settings.MinNewReadTime;
 
             byte Qvalue = Convert.ToByte(5);
             byte Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);

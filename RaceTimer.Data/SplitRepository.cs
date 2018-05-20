@@ -3,7 +3,7 @@ using System.Data.Entity;
 
 namespace RaceTimer.Data
 {
-    public class SplitRepository : BaseRepository<Split>
+    public class SplitRepository : BaseRepository<RaceTimerContext, Split>
     {
         public void AddSplit(Split split)
         {

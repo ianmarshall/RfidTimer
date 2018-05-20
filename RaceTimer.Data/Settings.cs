@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RaceTimer.Data
 {
-    public class SettingsRepository : BaseRepository<Settings>
+    public class SettingsRepository : BaseRepository<RaceTimerContext, Settings>
     {
 
     }

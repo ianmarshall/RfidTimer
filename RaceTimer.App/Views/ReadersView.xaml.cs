@@ -39,13 +39,13 @@ namespace RaceTimer.App.Views
         private void btnAddReader_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             var readerProfile = new ReaderProfile();
-            readerProfile.Settings = _rfidManager.Settings;
-            readerProfile.SettingsId = _rfidManager.Settings.Id;
+         //   readerProfile.Settings = _rfidManager.Settings;
+         //   readerProfile.SettingsId = _rfidManager.Settings.Id;
 
             readerProfile.PowerDbm = 30;
 
-            _readerProfileRepository.Add(readerProfile);
-            _readerProfileRepository.Save();
+          _readerProfileRepository.Add(readerProfile);
+           _readerProfileRepository.Save();
             _readers.Add(readerProfile);
         }
 

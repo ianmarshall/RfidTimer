@@ -44,9 +44,9 @@ namespace RaceTimer.Business
         public RfidManager(AthleteManager athleteManager)
         {
             _athleteManager = athleteManager;
-            _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
             _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
-            _deviceStrategies.Add(ReaderModel.UhfReader18Adapter, new UhfReader18Adapter());
+            _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
+           
 
             Settings = _settingsRepository.GetAll().FirstOrDefault();
 

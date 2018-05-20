@@ -34,7 +34,7 @@ namespace RaceTimer.Data
     public enum ConnectionType
     {
         Serial = 0,
-        Eathernet = 1
+        Ethernet = 1
     }
 
     public enum InventorySearchMode
@@ -43,6 +43,7 @@ namespace RaceTimer.Data
         Session1SingleTarget = 1,
         Session2DualTarget = 2,
         Session3DualTargetWithSuppression = 3,
+        Auto = 4,
     }
 
     public enum ReadingMode
@@ -55,9 +56,8 @@ namespace RaceTimer.Data
 
     public enum ReaderModel
     {
-        ChaFonIntegratedR2000,
         ChaFonFourChannelR2000,
-        UhfReader18Adapter,
+        ChaFonIntegratedR2000,
         MotorolaFourChannelFx7400
     }
 
@@ -94,6 +94,7 @@ namespace RaceTimer.Data
         public ReaderProfile()
         {
             PowerDbm = 30;
+            IpAddress = "192.168.0.250";
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -126,9 +127,14 @@ namespace RaceTimer.Data
         public IList<InventorySearchMode> InventorySearchModes { get; } = Enum.GetValues(typeof(InventorySearchMode)).Cast<InventorySearchMode>().ToList();
 
         public ComPort ComPort { get; set; }
-        
+
+        public string IpAddress { get; set; }
+
         [NotMapped]
         public IList<ComPort> ComPorts { get; } = Enum.GetValues(typeof(ComPort)).Cast<ComPort>().ToList();
+
+        [NotMapped]
+        public IList<ConnectionType> ConnectionTypes { get; } = Enum.GetValues(typeof(ConnectionType)).Cast<ConnectionType>().ToList();
 
         public StartReadDelay StartReadDelay { get; set; }
         [NotMapped]
@@ -167,10 +173,10 @@ namespace RaceTimer.Data
             }
         }
 
-        public int SettingsId { get; set; }
+       // public int SettingsId { get; set; }
 
         //[ForeignKey("SettingsId")]
-        public virtual Settings Settings { get; set; }
+        //public virtual Settings Settings { get; set; }
 
         string IDataErrorInfo.Error
         {

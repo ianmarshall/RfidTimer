@@ -108,7 +108,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         public bool CloseConnection()
         {
-            if (_readerProfile.ConnectionType == ConnectionType.Serial)
+            if (_readerProfile != null && _readerProfile.ConnectionType == ConnectionType.Serial)
             {
 
                 try

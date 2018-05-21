@@ -244,11 +244,11 @@ namespace RaceTimer.Business
                 atheleteSplit.Bib = athlete.Bib;
             }
 
-            if (split.InventorySearchMode == InventorySearchMode.Session1SingleTarget && AthleteSplits.Contains(atheleteSplit))
-            {
-                logger.Info("Suppress tag split: {0}", split.ToString());
-                return;
-            }
+            //if (split.InventorySearchMode == InventorySearchMode.Session1SingleTarget && AthleteSplits.Contains(atheleteSplit))
+            //{
+            //    logger.Info("Suppress tag split: {0}", split.ToString());
+            //    return;
+            //}
 
             logger.Info("Read tag split: {0}", split.ToString());
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -573,7 +574,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                     EPClen = daw[m] + 1;
                     temp = temps.Substring(m * 2 + 2, EPClen * 2);
                     sEPC = temp.Substring(0, temp.Length - 2);
-                    string RSSI = Convert.ToInt32(temp.Substring(temp.Length - 2, 2), 16).ToString();
+                    int RSSI = Convert.ToInt32(temp.Substring(temp.Length - 2, 2), 16);
                     m = m + EPClen + 1;
                     if (sEPC.Length != (EPClen - 1) * 2)
                     {
@@ -593,7 +594,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                         DateTimeOfDay = readTime,
                         TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
                         Epc = sEPC,
-                        //  Rssi = Convert.ToInt32(RSSI, 16).ToString(),
+                        Rssi = RSSI,
                         SplitName = _readerProfile.Name,
                         SplitDeviceId = _readerProfile.Id,
                         InventorySearchMode = _readerProfile.InventorySearchMode
@@ -603,7 +604,8 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
                     if (RecentTags.ContainsKey(sEPC))
                     {
-                        Split tag1 = RecentTags[sEPC];
+                        RecentTags[sEPC].Add(tag);
+                        //Split tag1 = RecentTags[sEPC];
                         //convert string to dt
 
                         //  ltrt = Convert.ToDateTime(epcDateTime);
@@ -612,7 +614,10 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
                     else
                     {
-                        RecentTags.TryAdd(sEPC, tag);
+                        NewTags.TryAdd(sEPC, new List<Split> { tag });
+                       // RecentTags.TryAdd(sEPC, new List<Split> { tag });
+                      //  onRecordTag(tag);
+                        Debug.WriteLine("onRecordTag new " + sEPC);
                     }
 
 
@@ -622,17 +627,62 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
             DateTime currentTime = DateTime.Now.ToLocalTime();
 
-            foreach (KeyValuePair<string, Split> recentTag in RecentTags)
+            foreach (KeyValuePair<string, List<Split>> newTag in NewTags)
             {
-                TimeSpan difference = currentTime - recentTag.Value.DateTimeOfDay;
+                Split nearestTag = newTag.Value.OrderByDescending(x => x.Rssi).FirstOrDefault();
 
-                if (difference.TotalSeconds >= 3)
+                TimeSpan difference = currentTime - nearestTag.DateTimeOfDay;
+
+                if (difference.TotalSeconds > 3)
                 {
-                    Split removedTag;
-                    RecentTags.TryRemove(recentTag.Key, out removedTag);
+                    List<Split> removedTag;
+                    if (NewTags.TryRemove(newTag.Key, out removedTag))
+                    {
+                        Debug.WriteLine("removed " + newTag.Key);
 
-                    onRecordTag(removedTag);
+                        if (removedTag != null)
+                        {
+                            onRecordTag(nearestTag);
+
+                            RecentTags.TryAdd(newTag.Key, new List<Split> {nearestTag});
+                            Debug.WriteLine("onRecordTag final" + newTag.Key);
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("failed to remove new " + newTag.Key);
+                    }
                 }
+
+            }
+
+
+            foreach (KeyValuePair<string, List<Split>> recentTag in RecentTags)
+            {
+                Split nearestTag = recentTag.Value.OrderByDescending(x => x.Rssi).FirstOrDefault();
+
+                TimeSpan difference = currentTime - nearestTag.DateTimeOfDay;
+
+                if (difference.TotalSeconds > 5)
+                {
+                    List<Split> removedTag;
+                    if(RecentTags.TryRemove(recentTag.Key, out removedTag))
+                    {
+                        Debug.WriteLine("removed " + recentTag.Key);
+
+                        if (removedTag != null)
+                        {
+                            onRecordTag(nearestTag);
+
+                            Debug.WriteLine("onRecordTag final" + recentTag.Key);
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("failed to remove final " + recentTag.Key);
+                    }
+                }
+                
             }
             //if ((fCmdRet == 1) || (fCmdRet == 2) || (fCmdRet == 0xFB))
             //{

@@ -18,7 +18,7 @@ namespace RaceTimer.Business.Reports
         public string RaceTime { get; set; }
         public string TimeOfDay { get; set; }
         public string Epc { get; set; }
-        public string Rssi { get; set; }
+        public int Rssi { get; set; }
         public string SplitName { get; set; }
         public string RaceName { get; set; }
         public string AverLap { get; set; }

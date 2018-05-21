@@ -17,7 +17,7 @@ namespace RaceTimer.Business.ViewModel
         public DateTime Time { get; set; }
         public string RaceTime { get; set; }
         public string SplitTime { get; set; }
-        public string Rssi { get; set; }
+        public int Rssi { get; set; }
 
         public bool Equals(AthleteSplit other)
         {

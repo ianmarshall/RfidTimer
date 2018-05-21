@@ -15,7 +15,7 @@ namespace RaceTimer.Data
         public double SplitTime { get; set; }
         public long RaceTime { get; set; }
         public string RaceTime2 { get; set;}
-        public string Rssi { get; set; }
+        public int Rssi { get; set; }
         public string SplitName { get; set; }
         public int SplitDeviceId { get; set; }
         public InventorySearchMode InventorySearchMode { get; set; }

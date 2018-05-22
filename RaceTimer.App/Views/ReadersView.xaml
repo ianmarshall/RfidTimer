@@ -73,8 +73,11 @@
                                 <ComboBox Name="cbInventorySearchMode"  SelectedValue="{Binding InventorySearchMode, Mode=TwoWay}" ItemsSource="{Binding InventorySearchModes}"/>
 
                                 <Label Content="Power"></Label>
-                                <ComboBox Name="cbPower"  SelectedValue="{Binding PowerDbm, Mode=TwoWay}" ItemsSource="{Binding Powers}"/>
-                                
+                                <ComboBox Name="PowerDbm"  SelectedValue="{Binding PowerDbm, Mode=TwoWay}" ItemsSource="{Binding Powers}"/>
+
+                                <Label Content="Gating time"></Label>
+                                <TextBox Text="{Binding GatingTime, Mode=TwoWay}"></TextBox>
+
                                 <Label Content="Reader Mode"></Label>
                                 <ComboBox Name="cbReadingMode"  SelectedValue="{Binding ReadingMode, Mode=TwoWay}" ItemsSource="{Binding ReadingModes}" Tag="{Binding}" SelectionChanged="cbReadingMode_SelectionChanged"/>
                                 <Label Content="Frequency Band"

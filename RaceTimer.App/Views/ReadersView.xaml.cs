@@ -151,13 +151,13 @@ namespace RaceTimer.App.Views
             if (reader.ReadingMode == ReadingMode.Desktop)
             {
                 reader.PowerDbm = 5;
-                reader.InventorySearchMode = InventorySearchMode.Session2DualTarget;
+                reader.InventorySearchMode = InventorySearchMode.Session1SingleTarget;
             }
 
             if (reader.ReadingMode == ReadingMode.Start || reader.ReadingMode == ReadingMode.Finish)
             {
                 reader.PowerDbm = 30;
-                reader.InventorySearchMode = InventorySearchMode.Session2DualTarget;
+                reader.InventorySearchMode = InventorySearchMode.Session1SingleTarget;
             }
 
             if (reader.ReadingMode == ReadingMode.Custom)

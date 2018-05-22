@@ -95,6 +95,7 @@ namespace RaceTimer.Data
         {
             PowerDbm = 30;
             IpAddress = "192.168.0.250";
+            GatingTime = 4;
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -108,20 +109,9 @@ namespace RaceTimer.Data
         public IList<ReadingMode> ReadingModes { get; } = Enum.GetValues(typeof(ReadingMode)).Cast<ReadingMode>().ToList();
         public ConnectionType ConnectionType { get; set; }
 
-        private InventorySearchMode _inventorySearchMode;
 
-        public InventorySearchMode InventorySearchMode
-        {
-            get { return _inventorySearchMode; }
-            set
-            {
-                if (_inventorySearchMode != value)
-                {
-                    _inventorySearchMode = value;
-                    OnPropertyChanged("InventorySearchMode");
-                }
-            }
-        }
+        public InventorySearchMode InventorySearchMode { get; set; }
+       
 
         [NotMapped]
         public IList<InventorySearchMode> InventorySearchModes { get; } = Enum.GetValues(typeof(InventorySearchMode)).Cast<InventorySearchMode>().ToList();
@@ -140,20 +130,11 @@ namespace RaceTimer.Data
         [NotMapped]
         public IList<StartReadDelay> StartReadDelays { get; } = Enum.GetValues(typeof(StartReadDelay)).Cast<StartReadDelay>().ToList();
 
-        private int _powerDbm;
+        public int PowerDbm { get; set; }
+     
 
-        public int PowerDbm
-        {
-            get { return _powerDbm; }
-            set
-            {
-                if (_powerDbm != value)
-                {
-                    _powerDbm = value;
-                    OnPropertyChanged("PowerDbm");
-                }
-            }
-        }
+        public int GatingTime { get; set; }
+
         [NotMapped]
         public IEnumerable<int> Powers { get; } = Enumerable.Range(1, 30);
 

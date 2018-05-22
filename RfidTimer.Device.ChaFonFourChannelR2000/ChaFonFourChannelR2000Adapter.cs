@@ -104,8 +104,13 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             //GetData();
             flash_G2();
 
+            ReportTags();
+
             //  Inventory();
         }
+
+
+
 
         public bool CloseConnection()
         {
@@ -357,134 +362,52 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         //}
 
 
-        private void GetData()
+      
+
+        private void ReportTags()
         {
-            byte[] ScanModeData = new byte[40960];
-            int nLen, NumLen;
-            string temp1 = "";
-            string syear = "";
-            string smonth = "";
-            string sday = "";
-            string shour = "";
-            string smin = "";
-            string ssec = "";
-            string Lyear = "";
-            string Lmonth = "";
-            string Lday = "";
-            string Lhour = "";
-            string Lmin = "";
-            string Lsec = "";
-            string binarystr1 = "";
-            string binarystr2 = "";
-            string CountStr = "";
-            string AntStr = "";
-            string EPCStr = "";
-            int ValidDatalength;
-            string temp;
-            ValidDatalength = 0;
-            DataGridViewRow rows = new DataGridViewRow();
-            int xtime = System.Environment.TickCount;
-            fCmdRet = RWDev.ReadActiveModeData(ScanModeData, ref ValidDatalength, frmcomportindex);
-            if (fCmdRet == 0)
+            DateTime currentTime = DateTime.Now.ToLocalTime();
+
+
+            foreach (KeyValuePair<string, Split> recentTag in RecentTags)
             {
-                try
+
+                TimeSpan difference = currentTime - recentTag.Value.DateTimeOfDay;
+
+                if (difference.TotalSeconds > _readerProfile.GatingTime)
                 {
-                    byte[] daw = new byte[ValidDatalength];
-                    Array.Copy(ScanModeData, 0, daw, 0, ValidDatalength);
-                    temp = ByteArrayToHexString(daw);
-                    fInventory_EPC_List = fInventory_EPC_List + temp;//把字符串存进列表
-                    nLen = fInventory_EPC_List.Length;
-                    while (fInventory_EPC_List.Length > 34)
+                    Split removedTag;
+
+                    if (RecentTags.TryRemove(recentTag.Key, out removedTag))
                     {
-                        string FlagStr = Convert.ToString(fComAdr, 16).PadLeft(2, '0') + "EE00";//查找头位置标志字符串
-                        int nindex = fInventory_EPC_List.IndexOf(FlagStr);
-                        if (nindex > 1)
-                            fInventory_EPC_List = fInventory_EPC_List.Substring(nindex - 2);
-                        else
+                        Debug.WriteLine("removed " + recentTag.Key);
+
+                        if (removedTag != null)
                         {
-                            fInventory_EPC_List = fInventory_EPC_List.Substring(2);
-                            continue;
+                            List<Split> tags;
+
+                            if (TagsInView.TryRemove(removedTag.Epc, out tags))
+                            {
+                                Split nearestTag = tags.OrderByDescending(x => x.Rssi).FirstOrDefault();
+                               
+                                onRecordTag(nearestTag);
+                            }
+                            else
+                            {
+                                onRecordTag(removedTag);
+                            }
+                          
+
+                            Debug.WriteLine("onRecordTag final" + recentTag.Key);
                         }
-                        NumLen = Convert.ToInt32(fInventory_EPC_List.Substring(0, 2), 16) * 2 + 2;//取第一个帧的长度
-                        if (fInventory_EPC_List.Length < NumLen)
-                        {
-                            break;
-                        }
-                        temp1 = fInventory_EPC_List.Substring(0, NumLen);
-                        fInventory_EPC_List = fInventory_EPC_List.Substring(NumLen);
-                        if (!CheckCRC(temp1)) continue;
-                        binarystr1 = Convert.ToString(Convert.ToInt32(temp1.Substring(8, 8), 16), 2).PadLeft(32, '0');
-                        syear = Convert.ToString(Convert.ToInt32(binarystr1.Substring(0, 6), 2)).PadLeft(2, '0');
-                        smonth = Convert.ToString(Convert.ToInt32(binarystr1.Substring(6, 4), 2)).PadLeft(2, '0');
-                        sday = Convert.ToString(Convert.ToInt32(binarystr1.Substring(10, 5), 2)).PadLeft(2, '0');
-                        shour = Convert.ToString(Convert.ToInt32(binarystr1.Substring(15, 5), 2)).PadLeft(2, '0');
-                        smin = Convert.ToString(Convert.ToInt32(binarystr1.Substring(20, 6), 2)).PadLeft(2, '0');
-                        ssec = Convert.ToString(Convert.ToInt32(binarystr1.Substring(26, 6), 2)).PadLeft(2, '0');
-
-                        binarystr2 = Convert.ToString(Convert.ToInt32(temp1.Substring(16, 8), 16), 2).PadLeft(32, '0');
-                        Lyear = Convert.ToString(Convert.ToInt32(binarystr2.Substring(0, 6), 2)).PadLeft(2, '0');
-                        Lmonth = Convert.ToString(Convert.ToInt32(binarystr2.Substring(6, 4), 2)).PadLeft(2, '0');
-                        Lday = Convert.ToString(Convert.ToInt32(binarystr2.Substring(10, 5), 2)).PadLeft(2, '0');
-                        Lhour = Convert.ToString(Convert.ToInt32(binarystr2.Substring(15, 5), 2)).PadLeft(2, '0');
-                        Lmin = Convert.ToString(Convert.ToInt32(binarystr2.Substring(20, 6), 2)).PadLeft(2, '0');
-                        Lsec = Convert.ToString(Convert.ToInt32(binarystr2.Substring(26, 6), 2)).PadLeft(2, '0');
-
-                        CountStr = Convert.ToString(Convert.ToInt32(temp1.Substring(24, 4), 16), 10);
-                        AntStr = Convert.ToString(Convert.ToInt32(temp1.Substring(28, 2), 16), 2).PadLeft(4, '0');
-                        EPCStr = temp1.Substring(30, temp1.Length - 34);
-
-                        var readTime = DateTime.Now;
-
-                        var tag = new Split
-                        {
-                            DateTimeOfDay = readTime,
-                            TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
-                            Epc = EPCStr,
-                            //  Rssi = Convert.ToInt32(RSSI, 16).ToString(),
-                            SplitName = _readerProfile.Name,
-                            SplitDeviceId = _readerProfile.Id,
-                            InventorySearchMode = _readerProfile.InventorySearchMode
-                        };
-                        onRecordTag(tag);
-
-                        bool isonlistview = false;
-                        //for (int i = 0; i < dataGridView2.RowCount; i++)
-                        //{
-                        //    if ((dataGridView2.Rows[i].Cells[1].Value != null) && (EPCStr == dataGridView2.Rows[i].Cells[1].Value.ToString()))
-                        //    {
-                        //        rows = dataGridView2.Rows[i];
-                        //        rows.Cells[3].Value = "20" + Lyear + "-" + Lmonth + "-" + Lday + " " + Lhour + ":" + Lmin + ":" + Lsec; ;
-                        //        rows.Cells[4].Value = AntStr;
-                        //        rows.Cells[5].Value = CountStr;
-                        //        isonlistview = true;
-                        //        break;
-                        //    }
-                        //}
-                        if (!isonlistview)
-                        {
-                            //string[] arr = new string[6];
-                            //arr[0] = (dataGridView2.RowCount + 1).ToString();
-                            //arr[1] = EPCStr;
-                            //arr[2] = "20" + syear + "-" + smonth + "-" + sday + " " + shour + ":" + smin + ":" + ssec;
-                            //arr[3] = "20" + Lyear + "-" + Lmonth + "-" + Lday + " " + Lhour + ":" + Lmin + ":" + Lsec;
-                            //arr[4] = AntStr;
-                            //arr[5] = CountStr;
-                            //dataGridView2.Rows.Insert(dataGridView2.RowCount, arr);
-                        }
-                        total_tagnum = total_tagnum + 1;////每解析一条记录加一
-                        //lxLed_toltag.Text = total_tagnum.ToString();
-                        //lxLed_toltime.Text = (System.Environment.TickCount - total_time).ToString();
+                    }
+                    else
+                    {
+                        Debug.WriteLine("failed to remove final " + recentTag.Key);
                     }
                 }
-                catch (System.Exception ex)
-                {
-                    ex.ToString();
-                }
             }
-            xtime = System.Environment.TickCount - xtime;
-            //lxLed_Num.Text = dataGridView2.RowCount.ToString();
-            //if ((System.Environment.TickCount - total_time) > 0)
-            //    lxLed_cmdsud.Text = (total_tagnum * 1000 / (System.Environment.TickCount - total_time)).ToString();
+
         }
 
         private void flash_G2()
@@ -600,114 +523,22 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                         InventorySearchMode = _readerProfile.InventorySearchMode
                     };
 
-                    string epcDateTime;
+                    
+                    TagsInView.AddOrUpdate(sEPC, new List<Split> { tag }, (key, tagsInView) =>
+                          {
+                              if (tagsInView.Count > 100)
+                              {
+                                  tagsInView.Clear();
+                              }
 
-                    if (RecentTags.ContainsKey(sEPC))
-                    {
-                        RecentTags[sEPC].Add(tag);
-                        //Split tag1 = RecentTags[sEPC];
-                        //convert string to dt
+                              tagsInView.Add(tag);
+                              return tagsInView;
+                          }
+                    );
 
-                        //  ltrt = Convert.ToDateTime(epcDateTime);
-                        //	  Console.WriteLine("Tag last seen at "+ epcDateTime);
-                    }
-
-                    else
-                    {
-                        NewTags.TryAdd(sEPC, new List<Split> { tag });
-                       // RecentTags.TryAdd(sEPC, new List<Split> { tag });
-                      //  onRecordTag(tag);
-                        Debug.WriteLine("onRecordTag new " + sEPC);
-                    }
-
-
-                    //  onRecordTag(tag);
+                    RecentTags.AddOrUpdate(sEPC, tag, (key, oldTag) => tag);
                 }
             }
-
-            DateTime currentTime = DateTime.Now.ToLocalTime();
-
-            foreach (KeyValuePair<string, List<Split>> newTag in NewTags)
-            {
-                Split nearestTag = newTag.Value.OrderByDescending(x => x.Rssi).FirstOrDefault();
-
-                TimeSpan difference = currentTime - nearestTag.DateTimeOfDay;
-
-                if (difference.TotalSeconds > 3)
-                {
-                    List<Split> removedTag;
-                    if (NewTags.TryRemove(newTag.Key, out removedTag))
-                    {
-                        Debug.WriteLine("removed " + newTag.Key);
-
-                        if (removedTag != null)
-                        {
-                            onRecordTag(nearestTag);
-
-                            RecentTags.TryAdd(newTag.Key, new List<Split> {nearestTag});
-                            Debug.WriteLine("onRecordTag final" + newTag.Key);
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine("failed to remove new " + newTag.Key);
-                    }
-                }
-
-            }
-
-
-            foreach (KeyValuePair<string, List<Split>> recentTag in RecentTags)
-            {
-                Split nearestTag = recentTag.Value.OrderByDescending(x => x.Rssi).FirstOrDefault();
-
-                TimeSpan difference = currentTime - nearestTag.DateTimeOfDay;
-
-                if (difference.TotalSeconds > 5)
-                {
-                    List<Split> removedTag;
-                    if(RecentTags.TryRemove(recentTag.Key, out removedTag))
-                    {
-                        Debug.WriteLine("removed " + recentTag.Key);
-
-                        if (removedTag != null)
-                        {
-                            onRecordTag(nearestTag);
-
-                            Debug.WriteLine("onRecordTag final" + recentTag.Key);
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine("failed to remove final " + recentTag.Key);
-                    }
-                }
-                
-            }
-            //if ((fCmdRet == 1) || (fCmdRet == 2) || (fCmdRet == 0xFB))
-            //{
-            //    if (cmdTime > CommunicationTime)
-            //        cmdTime = cmdTime - CommunicationTime;//减去通讯时间等于标签的实际时间
-            //    int tagrate = (CardNum * 1000) / cmdTime;//速度等于张数/时间
-            //    total_tagnum = total_tagnum + CardNum;
-            //    IntPtr ptrWnd = IntPtr.Zero;
-            //    ptrWnd = FindWindow(null, "UHFReader288 Demo V1.16");
-            //    if (ptrWnd != IntPtr.Zero)         // 检查当前统计窗口是否打开
-            //    {
-            //        string para = tagrate.ToString() + "," + total_tagnum.ToString() + "," + cmdTime.ToString();
-            //        SendMessage(ptrWnd, WM_SENDTAGSTAT, IntPtr.Zero, para);
-            //    }
-            //}
-            //else if (fCmdRet != 0x26)
-            //{
-            //    IntPtr ptrWnd1 = IntPtr.Zero;
-            //    ptrWnd1 = FindWindow(null, "UHFReader288 Demo V1.16");
-            //    if (ptrWnd1 != IntPtr.Zero)         // 检查当前统计窗口是否打开
-            //    {
-            //        string para = fCmdRet.ToString();
-            //        SendMessage(ptrWnd1, WM_SENDSTATU, IntPtr.Zero, para);
-            //    }
-            //}
         }
 
         private void onRecordTag(EventArgs e)

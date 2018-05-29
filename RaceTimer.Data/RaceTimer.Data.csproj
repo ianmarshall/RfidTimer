@@ -71,6 +71,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Split.cs" />
     <Compile Include="SplitRepository.cs" />
+    <Compile Include="TagsReports.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

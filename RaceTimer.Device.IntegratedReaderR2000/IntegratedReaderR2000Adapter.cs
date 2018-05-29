@@ -383,6 +383,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
         public event EventHandler<EventArgs> OnRecordTag;
         public event EventHandler<EventArgs> OnAssignTag;
+        public event EventHandler<EventArgs> OnReportTags;
 
         private void TimerTick(object sender, EventArgs e)
         {

@@ -77,6 +77,9 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         public bool BeginReading()
         {
+            RecentTags.Clear();
+            TagsInView.Clear();
+
             fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
 
             // Create a timer with a two second interval.
@@ -198,9 +201,14 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         public event EventHandler<EventArgs> OnRecordTag;
 
         public event EventHandler<EventArgs> OnAssignTag;
+        public event EventHandler<EventArgs> OnReportTags;
+
+   
 
         private void ReportTags()
         {
+            onReportTags(new TagsReports($"{RecentTags.Count} recent tags and {TagsInView.Count} tags in view"));
+
             DateTime currentTime = DateTime.Now.ToLocalTime();
 
             logger.Log(LogLevel.Trace, "RecentTags count: " + RecentTags.Count);
@@ -393,6 +401,11 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         private void onAssignTag(EventArgs e)
         {
             OnAssignTag?.Invoke(this, e);
+        }
+
+        private void onReportTags(EventArgs e)
+        {
+            OnReportTags?.Invoke(this, e);
         }
 
         public static string ByteArrayToHexString(byte[] data)

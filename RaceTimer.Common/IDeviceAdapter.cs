@@ -12,5 +12,6 @@ namespace RaceTimer.Common
         bool StopReading();
         event EventHandler<EventArgs> OnRecordTag;
         event EventHandler<EventArgs> OnAssignTag;
+        event EventHandler<EventArgs> OnReportTags;
     }
 }

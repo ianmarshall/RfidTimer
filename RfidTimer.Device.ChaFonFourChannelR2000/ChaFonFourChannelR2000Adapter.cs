@@ -83,7 +83,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
 
             // Create a timer with a two second interval.
-            _aTimer = new System.Timers.Timer(100);
+            _aTimer = new System.Timers.Timer(50);
             // Hook up the Elapsed event for the timer. 
             _aTimer.Elapsed += TimerTick;
             _aTimer.AutoReset = true;

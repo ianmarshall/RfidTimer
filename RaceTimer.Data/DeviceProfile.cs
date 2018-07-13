@@ -90,6 +90,13 @@ namespace RaceTimer.Data
         T90s = 90,
     }
 
+    public enum InventoryMode
+    {
+        Answer,
+        RealTime,
+        Buffer
+    }
+
     public class ReaderProfile : INotifyPropertyChanged, System.ComponentModel.IDataErrorInfo
     {
         public ReaderProfile()
@@ -112,10 +119,17 @@ namespace RaceTimer.Data
 
 
         public InventorySearchMode InventorySearchMode { get; set; }
-       
+
+
 
         [NotMapped]
         public IList<InventorySearchMode> InventorySearchModes { get; } = Enum.GetValues(typeof(InventorySearchMode)).Cast<InventorySearchMode>().ToList();
+
+        public InventoryMode InventoryMode { get; set; }
+
+        [NotMapped]
+        public IList<InventoryMode> InventoryModes { get; } = Enum.GetValues(typeof(InventoryMode)).Cast<InventoryMode>().ToList();
+
 
         public ComPort ComPort { get; set; }
 
@@ -132,7 +146,7 @@ namespace RaceTimer.Data
         public IList<StartReadDelay> StartReadDelays { get; } = Enum.GetValues(typeof(StartReadDelay)).Cast<StartReadDelay>().ToList();
 
         public int PowerDbm { get; set; }
-     
+
 
         public int GatingTime { get; set; }
 
@@ -155,7 +169,7 @@ namespace RaceTimer.Data
             }
         }
 
-       // public int SettingsId { get; set; }
+        // public int SettingsId { get; set; }
 
         //[ForeignKey("SettingsId")]
         //public virtual Settings Settings { get; set; }

@@ -145,9 +145,11 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             return true;
         }
 
-        public bool UpdateSettings()
+       
+
+        public bool UpdateSettings(ReaderProfile readerProfile)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
 

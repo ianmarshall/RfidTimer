@@ -16,7 +16,7 @@ namespace RaceTimer.Data
         public long RaceTime { get; set; }
         public string RaceTime2 { get; set;}
         public int Rssi { get; set; }
-        public int Antenna { get; set; }
+        public string Antenna { get; set; }
         public string SplitName { get; set; }
         public int SplitDeviceId { get; set; }
         public InventorySearchMode InventorySearchMode { get; set; }

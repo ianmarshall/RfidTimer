@@ -18,6 +18,9 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private ReaderProfile _readerProfile;
         private static System.Timers.Timer _aTimer;
+        private bool _readerConnected;
+
+        private Timer timer_Buff = new Timer();
 
         public const int USER = 0x0400;
         public const int WM_SENDTAG = USER + 101;
@@ -65,6 +68,11 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         //private static SearchCallBack searchCallBack = new SearchCallBack(searchCB);
         private string ReadTypes = "";
 
+        private volatile bool fIsBuffScan = false;
+        private volatile bool toStopThread = false;
+        private Thread mythread = null;
+        private volatile bool fIsInventoryScan = false;
+
         ~ChaFonFourChannelR2000Adapter()
         {
             CloseConnection();
@@ -77,15 +85,23 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         public bool BeginReading()
         {
-          
+
 
             RecentTags.Clear();
             TagsInView.Clear();
 
+
+
             fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
 
+            if (_readerProfile.InventoryMode == InventoryMode.Buffer)
+            {
+
+                StartBufferRead();
+            }
+
             // Create a timer with a two second interval.
-            _aTimer = new System.Timers.Timer(50);
+            _aTimer = new System.Timers.Timer(200);
             // Hook up the Elapsed event for the timer. 
             _aTimer.Elapsed += TimerTick;
             _aTimer.AutoReset = true;
@@ -99,9 +115,31 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         private void TimerTick(object sender, EventArgs e)
         {
-            flash_G2();
 
-          //  ReportTags();
+
+            if (fIsInventoryScan) return;
+            fIsInventoryScan = true;
+
+
+            switch (_readerProfile.InventoryMode)
+            {
+                case InventoryMode.Answer:
+                    flash_G2();
+                    break;
+                case InventoryMode.Buffer:
+                    ReadBufferData();
+                    //    ClearBufferData();
+                    break;
+
+                case InventoryMode.RealTime:
+                    GetRealtiemeData();
+                    //    ClearBufferData();
+                    break;
+            }
+
+            fIsInventoryScan = false;
+
+            //  ReportTags();
         }
 
         public bool CloseConnection()
@@ -112,7 +150,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             {
                 if (_readerProfile.ConnectionType == ConnectionType.Serial)
                 {
-                    RWDev.CloseSpecComPort((int)_readerProfile.ComPort);
+                    fCmdRet = RWDev.CloseSpecComPort(frmcomportindex);
                     result = true;
                 }
                 else
@@ -120,6 +158,8 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                     fCmdRet = RWDev.CloseNetPort(FrmPortIndex);
                     result = true;
                 }
+
+                _readerConnected = false;
             }
             catch (Exception e)
             {
@@ -156,10 +196,11 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                 {
                     frmcomportindex = FrmPortIndex;
 
-                     fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
+                    fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
 
                     string strLog = "Connect: "; // + ComboBox_COM.Text + "@" + ComboBox_baud2.Text;
                     //  WriteLog(lrtxtLog, strLog, 0);
+                    _readerConnected = true;
                     return true;
                 }
             }
@@ -190,13 +231,26 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             {
                 frmcomportindex = FrmPortIndex;
                 string strLog = "Connect: " + ipAddress + "@" + nPort.ToString();
+                _readerConnected = true;
                 return true;
             }
         }
 
         public bool StopReading()
         {
-            _aTimer.Enabled = false;
+            switch (_readerProfile.InventoryMode)
+            {
+                case InventoryMode.Answer:
+                    _aTimer.Enabled = false;
+                    break;
+                case InventoryMode.RealTime:
+                    _aTimer.Enabled = false;
+                    break;
+                case InventoryMode.Buffer:
+                    stopBufferRead();
+                    break;
+            }
+
             return true;
         }
 
@@ -206,29 +260,29 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
             Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
 
-            if (_aTimer.Enabled)
+            if (_readerConnected)
             {
                 RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
             }
 
             //   byte dminfre = 0, dmaxfre = 0;
-         //   int band = 2;
-         //   band = 4;
-         //  /// dminfre = Convert.ToByte(((band & 3) << 6) | (ComboBox_dminfre.SelectedIndex & 0x3F));
-         ////   dmaxfre = Convert.ToByte(((band & 0x0c) << 4) | (ComboBox_dmaxfre.SelectedIndex & 0x3F));
-         //   fCmdRet = RWDev.SetRegion(ref fComAdr, dmaxfre, dminfre, frmcomportindex);
-         //   if (fCmdRet != 0)
-         //   {
-         //       string strLog = "Set region failed: " + GetReturnCodeDesc(fCmdRet);
-         //       logger.Log(LogLevel.Error,  strLog);
-         //       return false;
-         //   }
-         //   else
-         //   {
-         //       string strLog = "Set region success ";
-         //       return true;
+            //   int band = 2;
+            //   band = 4;
+            //  /// dminfre = Convert.ToByte(((band & 3) << 6) | (ComboBox_dminfre.SelectedIndex & 0x3F));
+            ////   dmaxfre = Convert.ToByte(((band & 0x0c) << 4) | (ComboBox_dmaxfre.SelectedIndex & 0x3F));
+            //   fCmdRet = RWDev.SetRegion(ref fComAdr, dmaxfre, dminfre, frmcomportindex);
+            //   if (fCmdRet != 0)
+            //   {
+            //       string strLog = "Set region failed: " + GetReturnCodeDesc(fCmdRet);
+            //       logger.Log(LogLevel.Error,  strLog);
+            //       return false;
+            //   }
+            //   else
+            //   {
+            //       string strLog = "Set region success ";
+            //       return true;
 
-         //   }
+            //   }
             return true;
 
         }
@@ -238,7 +292,20 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         public event EventHandler<EventArgs> OnAssignTag;
         public event EventHandler<EventArgs> OnReportTags;
 
-   
+        private void setWorkMode()
+        {
+            byte ReadMode = 0;
+
+            if (_readerProfile.InventoryMode == InventoryMode.Answer || _readerProfile.InventoryMode == InventoryMode.Buffer)
+            {
+                ReadMode = 0;
+            }
+            else
+            {
+                ReadMode = 6;
+            }
+            fCmdRet = RWDev.SetWorkMode(ref fComAdr, ReadMode, frmcomportindex);
+        }
 
         private void ReportTags()
         {
@@ -247,7 +314,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                 return;
             }
 
-                onReportTags(new TagsReports($"{RecentTags.Count} recent tags and {TagsInView.Count} tags in view"));
+            onReportTags(new TagsReports($"{RecentTags.Count} recent tags and {TagsInView.Count} tags in view"));
 
             DateTime currentTime = DateTime.Now.ToLocalTime();
 
@@ -406,7 +473,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                         SplitName = _readerProfile.Name,
                         SplitDeviceId = _readerProfile.Id,
                         InventorySearchMode = _readerProfile.InventorySearchMode,
-                        Antenna = Ant
+                        Antenna = Ant.ToString()
                     };
 
                     if (_readerProfile.ReadingMode == ReadingMode.Desktop)
@@ -436,37 +503,223 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             }
         }
 
-        private void ReadProcess()
+        private void GetRealtiemeData()
         {
-            //fIsBuffScan = true;
-            //while (!toStopThread)
-            //{
-            //    if (BAnt1.Checked)
-            //    {
-            //        InAnt = 0x80;
-            //        GetBuffData();
-            //    }
-            //    if (BAnt2.Checked)
-            //    {
-            //        InAnt = 0x81;
-            //        GetBuffData();
-            //    }
-            //    if (BAnt3.Checked)
-            //    {
-            //        InAnt = 0x82;
-            //        GetBuffData();
-            //    }
-            //    if (BAnt4.Checked)
-            //    {
-            //        InAnt = 0x83;
-            //        GetBuffData();
-            //    }
-            //}
-            //fIsBuffScan = false;
+            byte[] ScanModeData = new byte[40960];
+            int nLen, NumLen;
+            string temp1 = "";
+            string binarystr1 = "";
+            string binarystr2 = "";
+            string RSSI = "";
+            string AntStr = "";
+            string lenstr = "";
+            string EPCStr = "";
+            int ValidDatalength;
+            string temp;
+            ValidDatalength = 0;
+            DataGridViewRow rows = new DataGridViewRow();
+            int xtime = System.Environment.TickCount;
+            fCmdRet = RWDev.ReadActiveModeData(ScanModeData, ref ValidDatalength, frmcomportindex);
+            if (fCmdRet == 0)
+            {
+                try
+                {
+                    byte[] daw = new byte[ValidDatalength];
+                    Array.Copy(ScanModeData, 0, daw, 0, ValidDatalength);
+                    temp = ByteArrayToHexString(daw);
+                    fInventory_EPC_List = fInventory_EPC_List + temp;//把字符串存进列表
+                    nLen = fInventory_EPC_List.Length;
+                    while (fInventory_EPC_List.Length > 18)
+                    {
+                        string FlagStr = Convert.ToString(fComAdr, 16).PadLeft(2, '0') + "EE00";//查找头位置标志字符串
+                        int nindex = fInventory_EPC_List.IndexOf(FlagStr);
+                        if (nindex > 1)
+                            fInventory_EPC_List = fInventory_EPC_List.Substring(nindex - 2);
+                        else
+                        {
+                            fInventory_EPC_List = fInventory_EPC_List.Substring(2);
+                            continue;
+                        }
+                        NumLen = Convert.ToInt32(fInventory_EPC_List.Substring(0, 2), 16) * 2 + 2;//取第一个帧的长度
+                        if (fInventory_EPC_List.Length < NumLen)
+                        {
+                            break;
+                        }
+                        temp1 = fInventory_EPC_List.Substring(0, NumLen);
+                        fInventory_EPC_List = fInventory_EPC_List.Substring(NumLen);
+                        if (!CheckCRC(temp1)) continue;
+                        AntStr = Convert.ToString(Convert.ToInt32(temp1.Substring(8, 2), 16), 2).PadLeft(4, '0');
+                        lenstr = Convert.ToString(Convert.ToInt32(temp1.Substring(10, 2), 16), 10);
+                        EPCStr = temp1.Substring(12, temp1.Length - 18);
+                        RSSI = temp1.Substring(temp1.Length - 6, 2);
+
+                        var readTime = DateTime.Now;
+
+                        var tag = new Split
+                        {
+                            DateTimeOfDay = readTime,
+                            TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
+                            Epc = EPCStr,
+                            Rssi = int.Parse(RSSI),
+                            SplitName = _readerProfile.Name,
+                            SplitDeviceId = _readerProfile.Id,
+                            InventorySearchMode = _readerProfile.InventorySearchMode,
+                            Antenna = AntStr
+                        };
+
+                        if (_readerProfile.ReadingMode == ReadingMode.Desktop)
+                        {
+                            onAssignTag(tag);
+                            continue;
+
+                        }
+
+                        onRecordTag(tag);
+
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    ex.ToString();
+                }
+            }
+
         }
 
-        private void GetBuffData()
+        private bool CheckCRC(string s)
         {
+            int i, j;
+            int current_crc_value;
+            byte crcL, crcH;
+            byte[] data = HexStringToByteArray(s);
+            current_crc_value = 0xFFFF;
+            for (i = 0; i <= (data.Length - 1); i++)
+            {
+                current_crc_value = current_crc_value ^ (data[i]);
+                for (j = 0; j < 8; j++)
+                {
+                    if ((current_crc_value & 0x01) != 0)
+                        current_crc_value = (current_crc_value >> 1) ^ 0x8408;
+                    else
+                        current_crc_value = (current_crc_value >> 1);
+                }
+            }
+            crcL = Convert.ToByte(current_crc_value & 0xFF);
+            crcH = Convert.ToByte((current_crc_value >> 8) & 0xFF);
+            if (crcH == 0 && crcL == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        private Thread ReadThread = null;
+
+        private void StartBufferRead()
+        {
+            ClearBufferData();
+
+            TIDFlag = 0;
+
+            total_time = Environment.TickCount;
+            total_tagnum = 0;
+
+            toStopThread = false;
+            if (fIsBuffScan == false)
+            {
+                ReadThread = new Thread(InventoryBufferProcess);
+                ReadThread.Start();
+            }
+            timer_Buff.Enabled = true;
+            //  }
+            //else
+            //{
+            //    btStartBuff.BackColor = Color.Transparent;
+            //    btStartBuff.Text = "Start";
+            //    if (fIsBuffScan)
+            //    {
+            //        toStopThread = true;//标志，接收数据线程判断stop为true，正常情况下会自动退出线程                                
+            //        if (ReadThread.Join(3000))
+            //        {
+            //            try
+            //            {
+            //                ReadThread.Abort();//若线程无法退出，强制结束
+            //            }
+            //            catch (Exception exp)
+            //            {
+            //                MessageBox.Show(exp.Message, "Thread error");
+            //            }
+            //        }
+            //        fIsBuffScan = false;
+            //    }
+            //    timer_Buff.Enabled = false;
+            //}
+        }
+
+        private void stopBufferRead()
+        {
+            ClearBufferData();
+
+            if (fIsBuffScan)
+            {
+                toStopThread = true;//标志，接收数据线程判断stop为true，正常情况下会自动退出线程                                
+                if (ReadThread.Join(3000))
+                {
+                    try
+                    {
+                        ReadThread.Abort();//若线程无法退出，强制结束
+                    }
+                    catch (Exception exp)
+                    {
+                        MessageBox.Show(exp.Message, "Thread error");
+                    }
+                }
+                fIsBuffScan = false;
+            }
+            timer_Buff.Enabled = false;
+        }
+
+
+        private void InventoryBufferProcess()
+        {
+            fIsBuffScan = true;
+            while (!toStopThread)
+            {
+                //if (BAnt1.Checked)
+                //{
+                //    InAnt = 0x80;
+                //    GetBuffData();
+                //}
+                //if (BAnt2.Checked)
+                //{
+                //    InAnt = 0x81;
+                //    GetBuffData();
+                //}
+                //if (BAnt3.Checked)
+                //{
+                //    InAnt = 0x82;
+                //    GetBuffData();
+                //}
+                //if (BAnt4.Checked)
+                //{
+                //    InAnt = 0x83;
+                //    GetBuffData();
+                //}
+
+                InAnt = 0x80;
+                InventoryBufferData();
+            }
+            fIsBuffScan = false;
+        }
+
+        private void InventoryBufferData()
+        {
+            Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
+            Qvalue = Convert.ToByte(4);
             int TagNum = 0;
             int BufferCount = 0;
             byte MaskMem = 0;
@@ -490,21 +743,29 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             else
                 Session = 0;
             FastFlag = 1;
+
+            //            fCmdRet = RWDev.Inventory_G2(ref fComAdr, Qvalue, Session, MaskMem, MaskAdr, MaskLen, MaskData, MaskFlag, AdrTID, LenTID, TIDFlag, Target, InAnt, Scantime, FastFlag, EPC, ref Ant, ref Totallen, ref CardNum, frmcomportindex);
             fCmdRet = RWDev.InventoryBuffer_G2(ref fComAdr, Qvalue, Session, MaskMem, MaskAdr, MaskLen, MaskData, MaskFlag, AdrTID, LenTID, TIDFlag, Target, InAnt, Scantime, FastFlag, ref BufferCount, ref TagNum, frmcomportindex);
             int x_time = System.Environment.TickCount - cbtime;//命令时间
-            //string strLog = "带缓存查询： " + GetReturnCodeDesc(fCmdRet);
+            string strLog = "InventoryBuffer error： " + GetReturnCodeDesc(fCmdRet);
             //WriteLog(lrtxtLog, strLog, 0);
             ///////////设置网络断线重连
             if (fCmdRet == 0)//代表已查找结束，
             {
                 IntPtr ptrWnd = IntPtr.Zero;
-                if (ptrWnd != IntPtr.Zero)         // 检查当前统计窗口是否打开
-                {
-                    total_tagnum = total_tagnum + TagNum;
-                    int tagrate = (TagNum * 1000) / x_time;//速度等于张数/时间
-                    string para = BufferCount.ToString() + "," + x_time.ToString() + "," + tagrate.ToString() + "," + total_tagnum.ToString();
-                   // SendMessage(ptrWnd, WM_SENDBUFF, IntPtr.Zero, para);
-                }
+
+                total_tagnum = total_tagnum + TagNum;
+                int tagrate = (TagNum * 1000) / x_time;//速度等于张数/时间
+                string para = BufferCount.ToString() + "," + x_time.ToString() + "," + tagrate.ToString() + "," + total_tagnum.ToString();
+                // SendMessage(ptrWnd, WM_SENDBUFF, IntPtr.Zero, para);
+
+
+
+            }
+
+            else
+            {
+                MessageBox.Show(strLog);
             }
         }
 
@@ -533,20 +794,132 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                     byte[] EPC = new byte[len];
                     Array.Copy(daw, m + 2, EPC, 0, len);
                     string sEPC = ByteArrayToHexString(EPC);
-                    string RSSI = daw[m + 2 + len].ToString();
+                    int RSSI = daw[m + 2 + len];
                     string sCount = daw[m + 3 + len].ToString();
                     m = m + 4 + len;
-                    
+
+                    var readTime = DateTime.Now;
+
+                    var tag = new Split
+                    {
+                        DateTimeOfDay = readTime,
+                        TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
+                        Epc = sEPC,
+                        Rssi = RSSI,
+                        SplitName = _readerProfile.Name,
+                        SplitDeviceId = _readerProfile.Id,
+                        InventorySearchMode = _readerProfile.InventorySearchMode,
+                        Antenna = ant
+                    };
+
+                    if (_readerProfile.ReadingMode == ReadingMode.Desktop)
+                    {
+                        onAssignTag(tag);
+                        continue;
+
+                    }
+
+                    onRecordTag(tag);
+
                 }
-              
+
                 string strLog = "Read buffer success ";
-              //  WriteLog(lrtxtLog, strLog, 0);
+                //  WriteLog(lrtxtLog, strLog, 0);
             }
             else
             {
-              
-                string strLog = "Read buffer failed! ";
+
+
+
+                string strLog = "Read buffer failed!： " + GetReturnCodeDesc(fCmdRet);
+
+                MessageBox.Show(strLog);
             }
+        }
+
+        private void ClearBufferData()
+        {
+            fCmdRet = RWDev.ClearBuffer_G2(ref fComAdr, frmcomportindex);
+            if (fCmdRet == 0)
+            {
+                string strLog = "Clear buffer success ";
+                //   WriteLog(lrtxtLog, strLog, 0);
+            }
+            else
+            {
+                string strLog = "Clear buffer failed";
+                //  WriteLog(lrtxtLog, strLog, 0);
+            }
+        }
+
+        private void btMSetParameter_Click(object sender, EventArgs e)
+        {
+            //byte[] Parameter = new byte[200];
+            //byte MaskMem = 0;
+            //byte[] MaskAdr = new byte[2];
+            //byte MaskLen = 0;
+            //byte[] MaskData = new byte[200];
+            //byte MaskFlag = 0;
+            //byte AdrTID = 0;
+            //byte LenTID = 0;
+            //byte TIDFlag = 0;
+            //if (MRB_G2.Checked)
+            //{
+            //    Parameter[0] = 0;
+            //}
+            //else
+            //{
+            //    Parameter[0] = 1;
+            //}
+
+            //Parameter[1] = (byte)COM_MRPTime.SelectedIndex;
+            //Parameter[2] = (byte)com_MFliterTime.SelectedIndex;
+            //Parameter[3] = (byte)com_MQ.SelectedIndex;
+            //Parameter[4] = (byte)com_MS.SelectedIndex;
+            //if (Parameter[4] > 3) Parameter[4] = 255;
+            //if (checkBox_mask.Checked)
+            //{
+            //    if (RBM_EPC.Checked)
+            //    {
+            //        MaskMem = 1;
+            //    }
+            //    else if (RBM_TID.Checked)
+            //    {
+            //        MaskMem = 2;
+            //    }
+            //    else if (RBM_USER.Checked)
+            //    {
+            //        MaskMem = 3;
+            //    }
+            //    if ((txt_Maddr.Text.Length != 4) || (txt_Mlen.Text.Length != 2) || (txt_Mdata.Text.Length % 2 != 0))
+            //    {
+            //        MessageBox.Show("Mask error!", "information");
+            //        return;
+            //    }
+            //    MaskAdr = HexStringToByteArray(txt_Maddr.Text);
+            //    int len = Convert.ToInt32(txt_Mlen.Text, 16);
+            //    MaskLen = (byte)len;
+            //    MaskData = HexStringToByteArray(txt_Mdata.Text);
+            //    MaskFlag = 1;
+            //}
+            //if (checkBox_tid.Checked)
+            //{
+            //    AdrTID = Convert.ToByte(txt_mtidaddr.Text, 16);
+            //    LenTID = Convert.ToByte(txt_Mtidlen.Text, 16);
+            //    TIDFlag = 1;
+            //}
+            //fCmdRet = RWDev.SetReadParameter(ref fComAdr, Parameter, MaskMem, MaskAdr, MaskLen, MaskData, MaskFlag, AdrTID, LenTID, TIDFlag, frmcomportindex);
+            //if (fCmdRet != 0)
+            //{
+            //    string strLog = "Set read parameter failed: " + GetReturnCodeDesc(fCmdRet);
+            //    WriteLog(lrtxtLog, strLog, 1);
+            //}
+            //else
+            //{
+            //    string strLog = "Set read parameter success ";
+            //    WriteLog(lrtxtLog, strLog, 0);
+            //}
+
         }
 
         private void onRecordTag(EventArgs e)
@@ -676,7 +1049,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                     return "";
             }
         }
-      
+
         private void StartReadDelay()
         {
             if (_readerProfile.StartReadDelay == RaceTimer.Data.StartReadDelay.None)
@@ -687,8 +1060,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
             int delayMiliSeconds = (int)_readerProfile.StartReadDelay * 1000;
 
-            Timer timer = new Timer();
-            timer.Interval = delayMiliSeconds;
+            Timer timer = new Timer { Interval = delayMiliSeconds };
             timer.Tick += (s, e) =>
             {
                 _aTimer.Enabled = true;

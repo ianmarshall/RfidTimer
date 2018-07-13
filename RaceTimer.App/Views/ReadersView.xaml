@@ -72,6 +72,10 @@
                                 <Label Content="Inventory Search Mode (Session)"></Label>
                                 <ComboBox Name="cbInventorySearchMode"  SelectedValue="{Binding InventorySearchMode, Mode=TwoWay}" ItemsSource="{Binding InventorySearchModes}"/>
 
+                                <Label Content="Inventory Mode "></Label>
+                                <ComboBox Name="cbInventoryMode"  SelectedValue="{Binding InventoryMode, Mode=TwoWay}" ItemsSource="{Binding InventoryModes}"/>
+
+
                                 <Label Content="Power"></Label>
                                 <ComboBox Name="PowerDbm"  SelectedValue="{Binding PowerDbm, Mode=TwoWay}" ItemsSource="{Binding Powers}"/>
 

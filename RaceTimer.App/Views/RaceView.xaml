@@ -6,7 +6,7 @@
             
              xmlns:business="clr-namespace:RaceTimer.Business;assembly=RaceTimer.Business"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="900">
+             d:DesignHeight="500" d:DesignWidth="1200">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
@@ -17,7 +17,6 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -42,7 +41,7 @@
             <TextBox Name="ReportTags"  Width="380" HorizontalAlignment="Center" TextAlignment="Center" FontSize="11" Padding="10" />
         </Border>-->
         <DataGrid Grid.Row="4" Grid.Column="1" Name="dgSplits" IsReadOnly="True" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
-                  ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700" Width="900" ColumnWidth="*">
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700" Width="1100" ColumnWidth="*">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="FontSize" Value="14"/>

@@ -206,6 +206,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="..\RfidTimer.Device.CF-RU5102-USB-Desktop\bin\Debug\UHFReader09CSharp.dll">
+      <Link>UHFReader09CSharp.dll</Link>
+    </Content>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

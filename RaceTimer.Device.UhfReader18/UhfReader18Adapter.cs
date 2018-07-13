@@ -130,9 +130,9 @@ namespace RaceTimer.Device.UhfReader18
             return true;
         }
 
-        public bool UpdateSettings()
+        public bool UpdateSettings(ReaderProfile readerProfil)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
 

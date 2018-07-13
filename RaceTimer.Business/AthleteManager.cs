@@ -161,6 +161,11 @@ namespace RaceTimer.Business
                 Message =
                     $"Tag {split.Epc} assigned to {nextAthlete.Bib} with no athlete name";
             }
+
+            if (AutoAssign)
+            {
+                NextBib++;
+            }
         }
 
         public void ExportAthletes()
@@ -175,6 +180,7 @@ namespace RaceTimer.Business
                     athleteList.Add(
                         new AthleteCsv
                         {
+                            Id = ath.Id,
                             Bib = ath.Bib,
                             FirstName = ath.FirstName,
                             LastName = ath.LastName,

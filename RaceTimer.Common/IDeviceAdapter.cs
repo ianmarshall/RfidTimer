@@ -10,7 +10,7 @@ namespace RaceTimer.Common
         bool CloseConnection();
         bool OpenConnection();
         bool StopReading();
-        bool UpdateSettings();
+        bool UpdateSettings(ReaderProfile readerProfile);
         event EventHandler<EventArgs> OnRecordTag;
         event EventHandler<EventArgs> OnAssignTag;
         event EventHandler<EventArgs> OnReportTags;

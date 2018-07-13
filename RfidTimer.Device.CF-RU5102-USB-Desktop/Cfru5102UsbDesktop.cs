@@ -48,12 +48,13 @@ namespace RfidTimer.Device.CF_RU5102_USB_Desktop
         public void Setup(ReaderProfile readerProfile)
         {
             _readerProfile = readerProfile;
+            _readerProfile.ReadingMode = ReadingMode.Desktop;
         }
 
         public bool BeginReading()
         {
             // Create a timer with a two second interval.
-            _aTimer = new System.Timers.Timer(200);
+            _aTimer = new System.Timers.Timer(500);
             // Hook up the Elapsed event for the timer. 
             _aTimer.Elapsed += TimerTick;
             _aTimer.AutoReset = true;
@@ -143,7 +144,7 @@ namespace RfidTimer.Device.CF_RU5102_USB_Desktop
             return true;
         }
 
-        public bool UpdateSettings()
+        public bool UpdateSettings(ReaderProfile readerProfile)
         {
             //  throw new NotImplementedException();
 

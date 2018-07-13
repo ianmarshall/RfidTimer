@@ -497,6 +497,47 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             }
         }
 
+
+        private void ReadBufferData()
+        {
+            int Totallen = 0;
+            int CardNum = 0;
+            byte[] pEPCList = new byte[30000];
+            //lxLed_BNum.Text = "0";
+            //lxLed_Bcmdsud.Text = "0";
+            //lxLed_Btoltag.Text = "0";
+            //lxLed_Btoltime.Text = "0";
+            //lxLed_cmdTime.Text = "0";
+            string temp = "";
+            fCmdRet = RWDev.ReadBuffer_G2(ref fComAdr, ref Totallen, ref CardNum, pEPCList, frmcomportindex);
+            if (fCmdRet == 1)
+            {
+                int m = 0;
+                byte[] daw = new byte[Totallen];
+                Array.Copy(pEPCList, daw, Totallen);
+                for (int i = 0; i < CardNum; i++)
+                {
+                    string ant = Convert.ToString(daw[m], 2).PadLeft(4, '0');
+                    int len = daw[m + 1];
+                    byte[] EPC = new byte[len];
+                    Array.Copy(daw, m + 2, EPC, 0, len);
+                    string sEPC = ByteArrayToHexString(EPC);
+                    string RSSI = daw[m + 2 + len].ToString();
+                    string sCount = daw[m + 3 + len].ToString();
+                    m = m + 4 + len;
+                    
+                }
+              
+                string strLog = "Read buffer success ";
+              //  WriteLog(lrtxtLog, strLog, 0);
+            }
+            else
+            {
+              
+                string strLog = "Read buffer failed! ";
+            }
+        }
+
         private void onRecordTag(EventArgs e)
         {
             OnRecordTag?.Invoke(this, e);

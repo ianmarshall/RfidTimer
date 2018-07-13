@@ -21,9 +21,9 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Name="spClockButtons" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="5">
+        <StackPanel Name="spClockButtons" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin="5" Width="800">
             <Label Width="45" Height="30" Content="Name"></Label>
-            <TextBox Name="rbRaceName" Width="120" Height="20" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"></TextBox>
+            <TextBox Name="rbRaceName" Width="200" Height="20" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"></TextBox>
             <Button Name="btnNewRace" IsEnabled="{Binding Connected}"  Content="New Race" Width="70" Height="40" Margin="5" Click="btnNewRace_Click" />
             <Button Name="btnStartTimer" Content="Start" Width="60" Height="40" Margin="5" Click="btnStartTimer_Click" />
             <Button Name="btnStopTimer" Content="Finish" Width="60" Margin="3" Height="40" IsEnabled="{Binding Source=ttbCountDown, Path=IsStarted}" Click="btnStopTimer_Click" />
@@ -33,7 +33,7 @@
         </StackPanel>
 
         <Border Grid.Row="2" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" CornerRadius="8" HorizontalAlignment="Center" Background="LightGray" Margin="5">
-            <TextBox Name="Show"  Width="380" HorizontalAlignment="Center" TextAlignment="Center" FontSize="24" Padding="10" />
+            <TextBox Name="Show"  Width="420" HorizontalAlignment="Center" TextAlignment="Center" FontSize="32" Padding="10" />
         </Border>
 
         <TextBox Grid.Row="3" Grid.Column="1" Name="ReportTags" Width="200" Height="20" Text="{Binding ReportTags}"></TextBox>
@@ -42,7 +42,7 @@
             <TextBox Name="ReportTags"  Width="380" HorizontalAlignment="Center" TextAlignment="Center" FontSize="11" Padding="10" />
         </Border>-->
         <DataGrid Grid.Row="4" Grid.Column="1" Name="dgSplits" IsReadOnly="True" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
-                  ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700">
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700" Width="900" ColumnWidth="*">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="FontSize" Value="14"/>

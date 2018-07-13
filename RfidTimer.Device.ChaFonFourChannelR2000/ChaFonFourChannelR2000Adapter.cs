@@ -156,7 +156,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                 {
                     frmcomportindex = FrmPortIndex;
 
-                    //   fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
+                     fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
 
                     string strLog = "Connect: "; // + ComboBox_COM.Text + "@" + ComboBox_baud2.Text;
                     //  WriteLog(lrtxtLog, strLog, 0);
@@ -200,26 +200,37 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             return true;
         }
 
-        public bool UpdateSettings()
+        public bool UpdateSettings(ReaderProfile readerProfile)
         {
-            byte dminfre = 0, dmaxfre = 0;
-            int band = 2;
-            band = 4;
-           /// dminfre = Convert.ToByte(((band & 3) << 6) | (ComboBox_dminfre.SelectedIndex & 0x3F));
-         //   dmaxfre = Convert.ToByte(((band & 0x0c) << 4) | (ComboBox_dmaxfre.SelectedIndex & 0x3F));
-            fCmdRet = RWDev.SetRegion(ref fComAdr, dmaxfre, dminfre, frmcomportindex);
-            if (fCmdRet != 0)
-            {
-                string strLog = "Set region failed: " + GetReturnCodeDesc(fCmdRet);
-                logger.Log(LogLevel.Error,  strLog);
-                return false;
-            }
-            else
-            {
-                string strLog = "Set region success ";
-                return true;
+            _readerProfile = readerProfile;
 
+            Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
+
+            if (_aTimer.Enabled)
+            {
+                RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
             }
+
+            //   byte dminfre = 0, dmaxfre = 0;
+         //   int band = 2;
+         //   band = 4;
+         //  /// dminfre = Convert.ToByte(((band & 3) << 6) | (ComboBox_dminfre.SelectedIndex & 0x3F));
+         ////   dmaxfre = Convert.ToByte(((band & 0x0c) << 4) | (ComboBox_dmaxfre.SelectedIndex & 0x3F));
+         //   fCmdRet = RWDev.SetRegion(ref fComAdr, dmaxfre, dminfre, frmcomportindex);
+         //   if (fCmdRet != 0)
+         //   {
+         //       string strLog = "Set region failed: " + GetReturnCodeDesc(fCmdRet);
+         //       logger.Log(LogLevel.Error,  strLog);
+         //       return false;
+         //   }
+         //   else
+         //   {
+         //       string strLog = "Set region success ";
+         //       return true;
+
+         //   }
+            return true;
+
         }
 
         public event EventHandler<EventArgs> OnRecordTag;

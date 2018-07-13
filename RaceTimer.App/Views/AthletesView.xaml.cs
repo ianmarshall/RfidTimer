@@ -39,6 +39,8 @@ namespace RaceTimer.App.Views
 
 
          dgAthletes.ItemsSource = _athleteManager.Athletes;
+
+            _athleteManager.NextBib = _athleteRepository.GetMaxBib() + 1;
             //    _athleteManager.
         }
 
@@ -72,6 +74,7 @@ namespace RaceTimer.App.Views
         {
             btnStopAssign.IsEnabled = true;
             _athleteManager.Message = "";
+            btnAssign.IsEnabled = false;
             _rfidManager.StartAssigning();
         }
 
@@ -80,7 +83,7 @@ namespace RaceTimer.App.Views
             if (cbAutoAssign.IsChecked.HasValue && cbAutoAssign.IsChecked.Value)
             {
                 _athleteManager.AutoAssign = true;
-                _athleteManager.NextBib = _athleteRepository.GetMaxBib() + 1;
+               // _athleteManager.NextBib = _athleteRepository.GetMaxBib() + 1;
             }
             else
             {
@@ -92,6 +95,7 @@ namespace RaceTimer.App.Views
         {
             _rfidManager.Stop();
             btnStopAssign.IsEnabled = false;
+            btnAssign.IsEnabled = true;
         }
 
 
@@ -148,7 +152,8 @@ namespace RaceTimer.App.Views
 
                     _athleteManager.Athletes.Remove(athelete);
 
-                   
+                    _athleteManager.NextBib = _athleteRepository.GetMaxBib() + 1;
+
                 }
             }
         }
@@ -195,6 +200,11 @@ namespace RaceTimer.App.Views
             var duplicateItems = _athleteManager.Athletes.GroupBy(item => item).ToDictionary(x => x.Key, x => x.Count());
             MessageBox.Show(duplicateItems.Count() + " DUPLICATES");
             dgDups.ItemsSource = _athleteManager.Athletes.GroupBy(item => item).ToDictionary(x => x.Key, x => x).Keys.Select(x => x);
+        }
+
+        private void btnNext_Click(object sender, RoutedEventArgs e)
+        {
+            _athleteManager.NextBib++;
         }
     }
 }

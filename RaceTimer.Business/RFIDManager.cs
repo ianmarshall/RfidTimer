@@ -8,7 +8,7 @@ using System.Windows.Data;
 using RaceTimer.Business.ViewModel;
 using RaceTimer.Common;
 using RaceTimer.Data;
-using RaceTimer.Device.IntegratedReaderR2000;
+//using RaceTimer.Device.IntegratedReaderR2000;
 using RfidTimer.Device.ChaFonFourChannelR2000;
 using NLog;
 using RfidTimer.Device.CF_RU5102_USB_Desktop;
@@ -44,8 +44,9 @@ namespace RaceTimer.Business
         public RfidManager(AthleteManager athleteManager)
         {
             _athleteManager = athleteManager;
+          //  _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
             _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
-            _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
+           // _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
             _deviceStrategies.Add(ReaderModel.ChaFonUsbDesktop, new Cfru5102UsbDesktop());
 
 
@@ -126,6 +127,17 @@ namespace RaceTimer.Business
                     _readerProfileRepository.Edit(readerProfile, readerProfile.Id);
                     _readerProfileRepository.Save();
                 }
+            }
+        }
+
+        public void UpdateSettings(IEnumerable<ReaderProfile> readerProfiles)
+        {
+            _readerProfiles = readerProfiles;
+
+            foreach (var readerProfile in _readerProfiles)
+            {
+                var device = _deviceStrategies[readerProfile.Model];
+                device.UpdateSettings(readerProfile);
             }
         }
 

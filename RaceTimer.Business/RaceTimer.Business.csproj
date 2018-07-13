@@ -71,10 +71,6 @@
       <Project>{76892C81-BD30-4233-B2A9-D9DDB20DA23C}</Project>
       <Name>RaceTimer.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RaceTimer.Device.IntegratedReaderR2000\RaceTimer.Device.IntegratedReaderR2000.csproj">
-      <Project>{078a3161-9608-4ffd-b6e4-6310a572fead}</Project>
-      <Name>RaceTimer.Device.IntegratedReaderR2000</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RaceTimer.Device.UhfReader18\RaceTimer.Device.UhfReader18.csproj">
       <Project>{76FEACB6-C21F-4834-AF08-867CE46B0020}</Project>
       <Name>RaceTimer.Device.UhfReader18</Name>

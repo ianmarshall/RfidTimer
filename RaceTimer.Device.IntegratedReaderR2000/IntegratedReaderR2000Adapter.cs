@@ -145,6 +145,11 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             return true;
         }
 
+        public bool UpdateSettings()
+        {
+            throw new NotImplementedException();
+        }
+
 
         private void StartReadDelay()
         {

@@ -130,6 +130,11 @@ namespace RaceTimer.Device.UhfReader18
             return true;
         }
 
+        public bool UpdateSettings()
+        {
+            throw new NotImplementedException();
+        }
+
 
         private void StartReadDelay()
         {

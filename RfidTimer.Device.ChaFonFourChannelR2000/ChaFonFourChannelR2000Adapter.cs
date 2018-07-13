@@ -77,6 +77,8 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         public bool BeginReading()
         {
+          
+
             RecentTags.Clear();
             TagsInView.Clear();
 
@@ -99,7 +101,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         {
             flash_G2();
 
-            ReportTags();
+          //  ReportTags();
         }
 
         public bool CloseConnection()
@@ -198,6 +200,28 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             return true;
         }
 
+        public bool UpdateSettings()
+        {
+            byte dminfre = 0, dmaxfre = 0;
+            int band = 2;
+            band = 4;
+           /// dminfre = Convert.ToByte(((band & 3) << 6) | (ComboBox_dminfre.SelectedIndex & 0x3F));
+         //   dmaxfre = Convert.ToByte(((band & 0x0c) << 4) | (ComboBox_dmaxfre.SelectedIndex & 0x3F));
+            fCmdRet = RWDev.SetRegion(ref fComAdr, dmaxfre, dminfre, frmcomportindex);
+            if (fCmdRet != 0)
+            {
+                string strLog = "Set region failed: " + GetReturnCodeDesc(fCmdRet);
+                logger.Log(LogLevel.Error,  strLog);
+                return false;
+            }
+            else
+            {
+                string strLog = "Set region success ";
+                return true;
+
+            }
+        }
+
         public event EventHandler<EventArgs> OnRecordTag;
 
         public event EventHandler<EventArgs> OnAssignTag;
@@ -207,7 +231,12 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         private void ReportTags()
         {
-            onReportTags(new TagsReports($"{RecentTags.Count} recent tags and {TagsInView.Count} tags in view"));
+            if (_readerProfile.ReadingMode == ReadingMode.Desktop)
+            {
+                return;
+            }
+
+                onReportTags(new TagsReports($"{RecentTags.Count} recent tags and {TagsInView.Count} tags in view"));
 
             DateTime currentTime = DateTime.Now.ToLocalTime();
 
@@ -375,6 +404,9 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                         continue;
 
                     }
+
+                    onRecordTag(tag);
+                    continue;
 
                     TagsInView.AddOrUpdate(sEPC, new List<Split> { tag }, (key, tagsInView) =>
                           {

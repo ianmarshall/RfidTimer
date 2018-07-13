@@ -33,7 +33,7 @@ namespace RaceTimer.App.Views
 
             readersControl.ItemsSource = _readers;
 
-            cbReadSuppressionTime.DataContext = _rfidManager.Settings;
+           // cbReadSuppressionTime.DataContext = _rfidManager.Settings;
         }
 
         private void btnAddReader_Click(object sender, System.Windows.RoutedEventArgs e)

@@ -58,6 +58,7 @@ namespace RaceTimer.Data
     {
         ChaFonFourChannelR2000,
         ChaFonIntegratedR2000,
+        ChaFonUsbDesktop,
         MotorolaFourChannelFx7400
     }
 

@@ -35,7 +35,13 @@
         <Border Grid.Row="2" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" CornerRadius="8" HorizontalAlignment="Center" Background="LightGray" Margin="5">
             <TextBox Name="Show"  Width="380" HorizontalAlignment="Center" TextAlignment="Center" FontSize="24" Padding="10" />
         </Border>
-        <DataGrid Grid.Row="3" Grid.Column="1" Name="dgSplits" IsReadOnly="True" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
+
+        <TextBox Grid.Row="3" Grid.Column="1" Name="ReportTags" Width="200" Height="20" Text="{Binding ReportTags}"></TextBox>
+
+        <!--<Border Grid.Row="3" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" CornerRadius="8" HorizontalAlignment="Center" Background="LightGray" Margin="5">
+            <TextBox Name="ReportTags"  Width="380" HorizontalAlignment="Center" TextAlignment="Center" FontSize="11" Padding="10" />
+        </Border>-->
+        <DataGrid Grid.Row="4" Grid.Column="1" Name="dgSplits" IsReadOnly="True" HorizontalAlignment="Center" ScrollViewer.CanContentScroll="True" 
                   ScrollViewer.VerticalScrollBarVisibility="Auto" Height="700">
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}</ProjectGuid>
+    <ProjectGuid>{721EB1F2-EE18-49F6-AB55-09C097DFDDBB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RaceTimer.Common</RootNamespace>
-    <AssemblyName>RaceTimer.Common</AssemblyName>
+    <RootNamespace>RfidTimer.Device.CF_RU5102_USB_Desktop</RootNamespace>
+    <AssemblyName>RfidTimer.Device.CF-RU5102-USB-Desktop</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,26 +30,44 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.12\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UHFReader09CSharp">
+      <HintPath>..\..\..\..\RFID\CF-RU5102 64bit demo_16081310184545\UHFReader09demomain\bin\x86\Debug\UHFReader09CSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LazyConcurrentDictionary.cs" />
-    <Compile Include="DeviceAdapterBase.cs" />
-    <Compile Include="IDeviceAdapter.cs" />
+    <Compile Include="Cfru5102UsbDesktop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RaceTimer.Common\RaceTimer.Common.csproj">
+      <Project>{5A5B02BE-D2AA-418D-B4A5-3DEC11B7E705}</Project>
+      <Name>RaceTimer.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RaceTimer.Data\RaceTimer.Data.csproj">
       <Project>{76892C81-BD30-4233-B2A9-D9DDB20DA23C}</Project>
       <Name>RaceTimer.Data</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Basic.dll" />
+    <Content Include="UHFReader09CSharp.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

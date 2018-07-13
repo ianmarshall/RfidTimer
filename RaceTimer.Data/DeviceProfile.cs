@@ -34,7 +34,7 @@ namespace RaceTimer.Data
     public enum ConnectionType
     {
         Serial = 0,
-        Eathernet = 1
+        Ethernet = 1
     }
 
     public enum InventorySearchMode
@@ -43,6 +43,7 @@ namespace RaceTimer.Data
         Session1SingleTarget = 1,
         Session2DualTarget = 2,
         Session3DualTargetWithSuppression = 3,
+        Auto = 4,
     }
 
     public enum ReadingMode
@@ -55,9 +56,9 @@ namespace RaceTimer.Data
 
     public enum ReaderModel
     {
-        ChaFonIntegratedR2000,
         ChaFonFourChannelR2000,
-        UhfReader18Adapter,
+        ChaFonIntegratedR2000,
+        ChaFonUsbDesktop,
         MotorolaFourChannelFx7400
     }
 
@@ -94,6 +95,8 @@ namespace RaceTimer.Data
         public ReaderProfile()
         {
             PowerDbm = 30;
+            IpAddress = "192.168.0.250";
+            GatingTime = 4;
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -107,47 +110,32 @@ namespace RaceTimer.Data
         public IList<ReadingMode> ReadingModes { get; } = Enum.GetValues(typeof(ReadingMode)).Cast<ReadingMode>().ToList();
         public ConnectionType ConnectionType { get; set; }
 
-        private InventorySearchMode _inventorySearchMode;
 
-        public InventorySearchMode InventorySearchMode
-        {
-            get { return _inventorySearchMode; }
-            set
-            {
-                if (_inventorySearchMode != value)
-                {
-                    _inventorySearchMode = value;
-                    OnPropertyChanged("InventorySearchMode");
-                }
-            }
-        }
+        public InventorySearchMode InventorySearchMode { get; set; }
+       
 
         [NotMapped]
         public IList<InventorySearchMode> InventorySearchModes { get; } = Enum.GetValues(typeof(InventorySearchMode)).Cast<InventorySearchMode>().ToList();
 
         public ComPort ComPort { get; set; }
-        
+
+        public string IpAddress { get; set; }
+
         [NotMapped]
         public IList<ComPort> ComPorts { get; } = Enum.GetValues(typeof(ComPort)).Cast<ComPort>().ToList();
+
+        [NotMapped]
+        public IList<ConnectionType> ConnectionTypes { get; } = Enum.GetValues(typeof(ConnectionType)).Cast<ConnectionType>().ToList();
 
         public StartReadDelay StartReadDelay { get; set; }
         [NotMapped]
         public IList<StartReadDelay> StartReadDelays { get; } = Enum.GetValues(typeof(StartReadDelay)).Cast<StartReadDelay>().ToList();
 
-        private int _powerDbm;
+        public int PowerDbm { get; set; }
+     
 
-        public int PowerDbm
-        {
-            get { return _powerDbm; }
-            set
-            {
-                if (_powerDbm != value)
-                {
-                    _powerDbm = value;
-                    OnPropertyChanged("PowerDbm");
-                }
-            }
-        }
+        public int GatingTime { get; set; }
+
         [NotMapped]
         public IEnumerable<int> Powers { get; } = Enumerable.Range(1, 30);
 
@@ -167,10 +155,10 @@ namespace RaceTimer.Data
             }
         }
 
-        public int SettingsId { get; set; }
+       // public int SettingsId { get; set; }
 
         //[ForeignKey("SettingsId")]
-        public virtual Settings Settings { get; set; }
+        //public virtual Settings Settings { get; set; }
 
         string IDataErrorInfo.Error
         {

@@ -145,6 +145,11 @@ namespace RaceTimer.Device.IntegratedReaderR2000
             return true;
         }
 
+        public bool UpdateSettings()
+        {
+            throw new NotImplementedException();
+        }
+
 
         private void StartReadDelay()
         {
@@ -244,9 +249,9 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
         private void Inventory()
         {
-            int readSuppressionTime = _readerProfile.Settings.ReadSuppressionTime;
-            int maxReadUpdateTime = _readerProfile.Settings.MaxReadUpdateTime;
-            int minNewReadTime = _readerProfile.Settings.MinNewReadTime;
+           int readSuppressionTime = 1; // = _readerProfile.Settings.ReadSuppressionTime;
+           int maxReadUpdateTime = 1; // = _readerProfile.Settings.MaxReadUpdateTime;
+            int minNewReadTime = 1; // = _readerProfile.Settings.MinNewReadTime;
 
             byte Qvalue = Convert.ToByte(5);
             byte Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
@@ -297,7 +302,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                         DateTimeOfDay = readTime,
                         TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
                         Epc = sEPC,
-                        Rssi = Convert.ToInt32(RSSI, 16).ToString(),
+                        Rssi = Convert.ToInt32(RSSI, 16),
                         SplitName = _readerProfile.Name,
                         SplitDeviceId = _readerProfile.Id,
                         InventorySearchMode = _readerProfile.InventorySearchMode
@@ -313,7 +318,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                         if (RecentTags.ContainsKey(tag.Epc))
                         {
                             Split foundTag = null;
-                            foundTag = RecentTags[tag.Epc];
+                          //  foundTag = RecentTags[tag.Epc];
                             // var nowSeconds = DateTime.Now.yo
 
                             //  var secondsOld = foundTag(DateTimeOfDay.AddSeconds(- DateTime.Now))
@@ -340,29 +345,29 @@ namespace RaceTimer.Device.IntegratedReaderR2000
                             if (timeSpan.Seconds > readSuppressionTime && timeSpan.Seconds <= maxReadUpdateTime)
                             {
                                 //update tag
-                                RecentTags.TryRemove(tag.Epc, out foundTag);
-                                RecentTags.TryAdd(tag.Epc, tag);
+                              //  RecentTags.TryRemove(tag.Epc, out foundTag);
+                             //   RecentTags.TryAdd(tag.Epc, tag);
                             }
 
 
                             if (timeSpan.Seconds > maxReadUpdateTime && timeSpan.Seconds < minNewReadTime)
                             {
                                 //update tag
-                                RecentTags.TryRemove(tag.Epc, out foundTag);
-                                RecentTags.TryAdd(tag.Epc, tag);
+                               // RecentTags.TryRemove(tag.Epc, out foundTag);
+                               // RecentTags.TryAdd(tag.Epc, tag);
                             }
 
 
                             if (timeSpan.Seconds >= minNewReadTime)
                             {
                                 //update tag
-                                RecentTags.TryRemove(tag.Epc, out foundTag);
-                                RecentTags.TryAdd(tag.Epc, tag);
+                             //   RecentTags.TryRemove(tag.Epc, out foundTag);
+                              //  RecentTags.TryAdd(tag.Epc, tag);
                             }
                         }
                         else
                         {
-                            RecentTags.TryAdd(tag.Epc, tag);
+                           // RecentTags.TryAdd(tag.Epc, tag);
                         }
                             
                         onRecordTag(tag);
@@ -383,6 +388,7 @@ namespace RaceTimer.Device.IntegratedReaderR2000
 
         public event EventHandler<EventArgs> OnRecordTag;
         public event EventHandler<EventArgs> OnAssignTag;
+        public event EventHandler<EventArgs> OnReportTags;
 
         private void TimerTick(object sender, EventArgs e)
         {

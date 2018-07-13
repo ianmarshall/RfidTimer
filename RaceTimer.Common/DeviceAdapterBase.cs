@@ -15,7 +15,17 @@ namespace RaceTimer.Common
 
    public class DeviceAdapterBase
     {
+      //  public static ConcurrentDictionary<string, List<Split>> RecentTags = new ConcurrentDictionary<string, List<Split>>();
+
         public static ConcurrentDictionary<string, Split> RecentTags = new ConcurrentDictionary<string, Split>();
+
+        public static ConcurrentDictionary<string, List<Split>> TagsInView = new ConcurrentDictionary<string, List<Split>>();
+
+        protected static readonly Object RecentTagsLock = new object();
+
+        protected static readonly Object NewTagsLock = new object();
+
+
         //protected void StartReadDelay()
         //{
         //    if (_readerProfile.StartReadDelay == Data.StartReadDelay.None)

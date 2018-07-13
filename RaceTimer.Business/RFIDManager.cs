@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using RaceTimer.Business.ViewModel;
@@ -11,8 +10,8 @@ using RaceTimer.Common;
 using RaceTimer.Data;
 //using RaceTimer.Device.IntegratedReaderR2000;
 using RfidTimer.Device.ChaFonFourChannelR2000;
-using RaceTimer.Device.UhfReader18;
 using NLog;
+using RfidTimer.Device.CF_RU5102_USB_Desktop;
 
 namespace RaceTimer.Business
 {
@@ -24,6 +23,7 @@ namespace RaceTimer.Business
         private readonly object _syncLock = new object();
         private bool _connected;
         private bool _isReading;
+        private string _reportTags;
         private readonly Dictionary<ReaderModel, IDeviceAdapter> _deviceStrategies =
             new Dictionary<ReaderModel, IDeviceAdapter>();
         public Race CurrentRace;
@@ -46,11 +46,13 @@ namespace RaceTimer.Business
             _athleteManager = athleteManager;
           //  _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
             _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
-            _deviceStrategies.Add(ReaderModel.UhfReader18Adapter, new UhfReader18Adapter());
+            _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
+            _deviceStrategies.Add(ReaderModel.ChaFonUsbDesktop, new Cfru5102UsbDesktop());
+
 
             Settings = _settingsRepository.GetAll().FirstOrDefault();
 
-            if(Settings == null)
+            if (Settings == null)
             {
                 Settings = new Settings
                 {
@@ -93,6 +95,19 @@ namespace RaceTimer.Business
             }
         }
 
+        public  string ReportTags
+        {
+            get { return _reportTags; }
+            set
+            {
+                if (_reportTags != value)
+                {
+                    _reportTags = value;
+                    OnPropertyChanged("ReportTags");
+                }
+            }
+        }
+
         public void SetUp(IEnumerable<ReaderProfile> readerProfiles)
         {
             _readerProfiles = readerProfiles;
@@ -104,6 +119,7 @@ namespace RaceTimer.Business
 
                 device.OnRecordTag += OnRecordTag;
                 device.OnAssignTag += _athleteManager.OnAssignTag;
+                device.OnReportTags += OnReportTags;
                 Connected = device.OpenConnection();
 
                 if (Connected)
@@ -112,6 +128,13 @@ namespace RaceTimer.Business
                     _readerProfileRepository.Save();
                 }
             }
+        }
+
+        private void OnReportTags(object sender, EventArgs e)
+        {
+            TagsReports tagsReports = (TagsReports)e;
+
+            ReportTags = tagsReports.TagsReportsText();
         }
 
         public bool EnableReader(ReaderProfile readerProfile)
@@ -160,9 +183,14 @@ namespace RaceTimer.Business
             {
                 IDeviceAdapter device = _deviceStrategies[readerProfile.Model];
                 IsReading = !device.StopReading();
-            }
 
-            logger.Info("Finished race {0} {1} at {2}", CurrentRace.Id, CurrentRace.Name, CurrentRace.FinishDateTime);
+                if (readerProfile.ReadingMode != ReadingMode.Desktop)
+                {
+                    logger.Info("Finished race {0} {1} at {2}", CurrentRace.Id, CurrentRace.Name, CurrentRace.FinishDateTime);
+                }
+            }
+            
+               
         }
 
         public bool CloseAll()
@@ -192,6 +220,8 @@ namespace RaceTimer.Business
         {
             Split split = (Split)e;
 
+        
+
             Task.Factory.StartNew(() =>
             {
                 lock (_syncLock)
@@ -203,23 +233,23 @@ namespace RaceTimer.Business
 
         private void RecordSplit(Split split)
         {
-            DateTime prevSplit = GetpreviousSplit(split.Epc);
+      //    AthleteSplit prevSplit = GetpreviousSplit(split.Epc);
+
+        //  DateTime prevSplitTime = GetpreviousSplitTime(split.Epc);
 
             split.RaceTime = split.DateTimeOfDay.Subtract(CurrentRace.StartDateTime.TimeOfDay).Ticks;
             split.RaceTime2 = split.DateTimeOfDay.Subtract(CurrentRace.StartDateTime.TimeOfDay).ToString("HH:mm:ss:ff");
 
-            split.SplitTime = split.DateTimeOfDay.Subtract(prevSplit.TimeOfDay).TimeOfDay.TotalMilliseconds;
+            split.SplitTime = split.DateTimeOfDay.TimeOfDay.TotalMilliseconds;
 
             split.RaceId = CurrentRace.Id;
             split.SplitDeviceId = split.SplitDeviceId;
             split.SplitName = split.SplitName;
 
-            var splitCount = AthleteSplits.Count(x => x.Epc == split.Epc && x.SplitDeviceId == split.SplitDeviceId) + 1;
-            split.SplitLapCount = splitCount;
+           //var splitCount = AthleteSplits.Count(x => x.Epc == split.Epc && x.SplitDeviceId == split.SplitDeviceId) + 1;
+           // split.SplitLapCount = splitCount;
 
-
-
-            var atheleteSplit = new AthleteSplit
+            AthleteSplit atheleteSplit = new AthleteSplit
             {
                 Epc = split.Epc,
                 Time = split.DateTimeOfDay,
@@ -228,7 +258,7 @@ namespace RaceTimer.Business
                 Rssi = split.Rssi,
                 SplitName = split.SplitName,
                 SplitDeviceId = split.SplitDeviceId,
-                SplitLapCount = splitCount
+                SplitLapCount = split.SplitLapCount
             };
 
 
@@ -244,13 +274,7 @@ namespace RaceTimer.Business
                 atheleteSplit.Bib = athlete.Bib;
             }
 
-            if (split.InventorySearchMode == InventorySearchMode.Session1SingleTarget && AthleteSplits.Contains(atheleteSplit))
-            {
-                logger.Info("Suppress tag split: {0}", split.ToString());
-                return;
-            }
-
-            logger.Info("Read tag split: {0}", split.ToString());
+            logger.Info("Read tag split: {0}", split);
 
             AthleteSplits.Insert(0, atheleteSplit);
 
@@ -258,13 +282,19 @@ namespace RaceTimer.Business
             _splitRepository.Save();
         }
 
-        private DateTime GetpreviousSplit(string epc)
+        private AthleteSplit GetpreviousSplit(string epc)
         {
-            var split = AthleteSplits.OrderByDescending(x => x.Time).FirstOrDefault(x => x.Epc == epc);
+            AthleteSplit split = AthleteSplits.OrderByDescending(x => x.Time).FirstOrDefault(x => x.Epc == epc);
+
+            return split;
+        }
+
+        private DateTime GetpreviousSplitTime(string epc)
+        {
+            var split = GetpreviousSplit(epc);
 
             if (split != null)
             {
-
                 return split.Time;
             }
 
@@ -273,9 +303,10 @@ namespace RaceTimer.Business
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged(string name)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChangedEventHandler handler = PropertyChanged;
+            handler?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

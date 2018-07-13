@@ -9,7 +9,7 @@ using System.Text;
 
 namespace RaceTimer.Data
 {
-    public class AthleteRepository : BaseRepository<Athlete>
+    public class AthleteRepository : BaseRepository<RaceTimerContext, Athlete>
     {
         public int GetMaxBib()
         {

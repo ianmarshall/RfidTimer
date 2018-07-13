@@ -45,6 +45,8 @@ namespace RaceTimer.App.Views
 
             this.Show.Text = _raceTime.ToString("HH:mm:ss:ff");
 
+            //this.ReportTags.Text = _rfidManager.ReportTags;
+
             dgSplits.ItemsSource = _rfidManager.AthleteSplits;
 
             //   btnStartTimer.IsEnabled = RfidManager.Connected;

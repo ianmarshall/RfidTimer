@@ -75,6 +75,10 @@
       <Project>{76FEACB6-C21F-4834-AF08-867CE46B0020}</Project>
       <Name>RaceTimer.Device.UhfReader18</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RfidTimer.Device.CF-RU5102-USB-Desktop\RfidTimer.Device.CF-RU5102-USB-Desktop.csproj">
+      <Project>{721EB1F2-EE18-49F6-AB55-09C097DFDDBB}</Project>
+      <Name>RfidTimer.Device.CF-RU5102-USB-Desktop</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RfidTimer.Device.ChaFonFourChannelR2000\RfidTimer.Device.ChaFonFourChannelR2000.csproj">
       <Project>{93EF6C96-6158-468D-90ED-291ADD443FA8}</Project>
       <Name>RfidTimer.Device.ChaFonFourChannelR2000</Name>

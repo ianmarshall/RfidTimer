@@ -33,19 +33,19 @@ namespace RaceTimer.App.Views
 
             readersControl.ItemsSource = _readers;
 
-            cbReadSuppressionTime.DataContext = _rfidManager.Settings;
+           // cbReadSuppressionTime.DataContext = _rfidManager.Settings;
         }
 
         private void btnAddReader_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             var readerProfile = new ReaderProfile();
-            readerProfile.Settings = _rfidManager.Settings;
-            readerProfile.SettingsId = _rfidManager.Settings.Id;
+         //   readerProfile.Settings = _rfidManager.Settings;
+         //   readerProfile.SettingsId = _rfidManager.Settings.Id;
 
             readerProfile.PowerDbm = 30;
 
-            _readerProfileRepository.Add(readerProfile);
-            _readerProfileRepository.Save();
+          _readerProfileRepository.Add(readerProfile);
+           _readerProfileRepository.Save();
             _readers.Add(readerProfile);
         }
 
@@ -151,13 +151,13 @@ namespace RaceTimer.App.Views
             if (reader.ReadingMode == ReadingMode.Desktop)
             {
                 reader.PowerDbm = 5;
-                reader.InventorySearchMode = InventorySearchMode.Session2DualTarget;
+                reader.InventorySearchMode = InventorySearchMode.Session1SingleTarget;
             }
 
             if (reader.ReadingMode == ReadingMode.Start || reader.ReadingMode == ReadingMode.Finish)
             {
                 reader.PowerDbm = 30;
-                reader.InventorySearchMode = InventorySearchMode.Session2DualTarget;
+                reader.InventorySearchMode = InventorySearchMode.Session1SingleTarget;
             }
 
             if (reader.ReadingMode == ReadingMode.Custom)

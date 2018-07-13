@@ -29,7 +29,7 @@ namespace RfidTimer.Device.CF_RU5102_USB_Desktop
         private ReaderProfile _readerProfile;
         private static System.Timers.Timer _aTimer;
 
-      
+
         private int fCmdRet = 30; //所有执行指令的返回值
         private int fOpenComIndex; //打开的串口索引号
         private bool fIsInventoryScan;
@@ -145,7 +145,7 @@ namespace RfidTimer.Device.CF_RU5102_USB_Desktop
 
         public bool UpdateSettings()
         {
-          //  throw new NotImplementedException();
+            //  throw new NotImplementedException();
 
             return true;
         }
@@ -218,23 +218,14 @@ namespace RfidTimer.Device.CF_RU5102_USB_Desktop
                         DateTimeOfDay = readTime,
                         TimeOfDay = readTime.ToString("hh.mm.ss.ff"),
                         Epc = sEPC,
-                     //   Rssi = RSSI,
+                        //   Rssi = RSSI,
                         SplitName = _readerProfile.Name,
                         SplitDeviceId = _readerProfile.Id,
                         InventorySearchMode = _readerProfile.InventorySearchMode,
-                      //  Antenna = Ant
+                        //  Antenna = Ant
                     };
 
-                    if (_readerProfile.ReadingMode == ReadingMode.Desktop)
-                    {
-                        onAssignTag(tag);
-
-                      
-                       
-
-
-                    }
-
+                    onAssignTag(tag);
 
                 }
 

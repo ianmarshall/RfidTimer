@@ -206,8 +206,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Content Include="..\RfidTimer.Device.CF-RU5102-USB-Desktop\bin\Debug\UHFReader09CSharp.dll">
+    <Content Include="..\RfidTimer.Device.CF-RU5102-USB-Desktop\Basic.dll">
+      <Link>Basic.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\RfidTimer.Device.CF-RU5102-USB-Desktop\UHFReader09CSharp.dll">
       <Link>UHFReader09CSharp.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -239,10 +244,6 @@
   <ItemGroup>
     <Content Include="..\RaceTimer.Data\RaceTimer.sdf">
       <Link>RaceTimer.sdf</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\RaceTimer.Device.IntegratedReaderR2000\Basic.dll">
-      <Link>Basic.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\RaceTimer.Device.UhfReader18\Basic2.dll">

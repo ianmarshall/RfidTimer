@@ -9,7 +9,7 @@ using System.Windows.Data;
 using RaceTimer.Business.ViewModel;
 using RaceTimer.Common;
 using RaceTimer.Data;
-using RaceTimer.Device.IntegratedReaderR2000;
+//using RaceTimer.Device.IntegratedReaderR2000;
 using RfidTimer.Device.ChaFonFourChannelR2000;
 using RaceTimer.Device.UhfReader18;
 using NLog;
@@ -44,7 +44,7 @@ namespace RaceTimer.Business
         public RfidManager(AthleteManager athleteManager)
         {
             _athleteManager = athleteManager;
-            _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
+          //  _deviceStrategies.Add(ReaderModel.ChaFonIntegratedR2000, new IntegratedReaderR2000Adapter());
             _deviceStrategies.Add(ReaderModel.ChaFonFourChannelR2000, new ChaFonFourChannelR2000Adapter());
             _deviceStrategies.Add(ReaderModel.UhfReader18Adapter, new UhfReader18Adapter());
 

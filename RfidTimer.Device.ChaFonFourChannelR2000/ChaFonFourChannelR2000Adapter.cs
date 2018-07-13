@@ -425,6 +425,78 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             }
         }
 
+        private void ReadProcess()
+        {
+            //fIsBuffScan = true;
+            //while (!toStopThread)
+            //{
+            //    if (BAnt1.Checked)
+            //    {
+            //        InAnt = 0x80;
+            //        GetBuffData();
+            //    }
+            //    if (BAnt2.Checked)
+            //    {
+            //        InAnt = 0x81;
+            //        GetBuffData();
+            //    }
+            //    if (BAnt3.Checked)
+            //    {
+            //        InAnt = 0x82;
+            //        GetBuffData();
+            //    }
+            //    if (BAnt4.Checked)
+            //    {
+            //        InAnt = 0x83;
+            //        GetBuffData();
+            //    }
+            //}
+            //fIsBuffScan = false;
+        }
+
+        private void GetBuffData()
+        {
+            int TagNum = 0;
+            int BufferCount = 0;
+            byte MaskMem = 0;
+            byte[] MaskAdr = new byte[2];
+            byte MaskLen = 0;
+            byte[] MaskData = new byte[100];
+            byte MaskFlag = 0;
+            byte AdrTID = 0;
+            byte LenTID = 0;
+            AdrTID = 0;
+            LenTID = 6;
+            MaskFlag = 0;
+            int cbtime = System.Environment.TickCount;
+            TagNum = 0;
+            BufferCount = 0;
+            Target = 0;
+            Scantime = 0x14;
+            Qvalue = 6;
+            if (TIDFlag == 0)
+                Session = 255;
+            else
+                Session = 0;
+            FastFlag = 1;
+            fCmdRet = RWDev.InventoryBuffer_G2(ref fComAdr, Qvalue, Session, MaskMem, MaskAdr, MaskLen, MaskData, MaskFlag, AdrTID, LenTID, TIDFlag, Target, InAnt, Scantime, FastFlag, ref BufferCount, ref TagNum, frmcomportindex);
+            int x_time = System.Environment.TickCount - cbtime;//命令时间
+            //string strLog = "带缓存查询： " + GetReturnCodeDesc(fCmdRet);
+            //WriteLog(lrtxtLog, strLog, 0);
+            ///////////设置网络断线重连
+            if (fCmdRet == 0)//代表已查找结束，
+            {
+                IntPtr ptrWnd = IntPtr.Zero;
+                if (ptrWnd != IntPtr.Zero)         // 检查当前统计窗口是否打开
+                {
+                    total_tagnum = total_tagnum + TagNum;
+                    int tagrate = (TagNum * 1000) / x_time;//速度等于张数/时间
+                    string para = BufferCount.ToString() + "," + x_time.ToString() + "," + tagrate.ToString() + "," + total_tagnum.ToString();
+                   // SendMessage(ptrWnd, WM_SENDBUFF, IntPtr.Zero, para);
+                }
+            }
+        }
+
         private void onRecordTag(EventArgs e)
         {
             OnRecordTag?.Invoke(this, e);

@@ -204,9 +204,14 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         {
             _readerProfile = readerProfile;
 
-            RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
+            Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
 
-         //   byte dminfre = 0, dmaxfre = 0;
+            if (_aTimer.Enabled)
+            {
+                RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
+            }
+
+            //   byte dminfre = 0, dmaxfre = 0;
          //   int band = 2;
          //   band = 4;
          //  /// dminfre = Convert.ToByte(((band & 3) << 6) | (ComboBox_dminfre.SelectedIndex & 0x3F));

@@ -130,6 +130,17 @@ namespace RaceTimer.Business
             }
         }
 
+        public void UpdateSettings(IEnumerable<ReaderProfile> readerProfiles)
+        {
+            _readerProfiles = readerProfiles;
+
+            foreach (var readerProfile in _readerProfiles)
+            {
+                var device = _deviceStrategies[readerProfile.Model];
+                device.UpdateSettings(readerProfile);
+            }
+        }
+
         private void OnReportTags(object sender, EventArgs e)
         {
             TagsReports tagsReports = (TagsReports)e;

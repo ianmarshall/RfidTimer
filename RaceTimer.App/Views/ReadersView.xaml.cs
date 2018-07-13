@@ -110,6 +110,8 @@ namespace RaceTimer.App.Views
             ReaderProfile reader = (ReaderProfile)((Button)sender).Tag;
             _readerProfileRepository.Edit(reader, reader.Id);
             _readerProfileRepository.Save();
+
+            _rfidManager.UpdateSettings(_readers);
         }
 
         private void Button_Click_Test(object sender, System.Windows.RoutedEventArgs e)

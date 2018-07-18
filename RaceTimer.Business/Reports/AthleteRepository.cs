@@ -3,8 +3,6 @@ namespace RaceTimer.Data
 {
     public class AthleteCsv
     {
-        public int Id { get; set; }
-
         public int Bib { get; set; }
 
         public string TagId { get; set; }
@@ -15,6 +13,6 @@ namespace RaceTimer.Data
 
         public Gendor Gendor { get; set; }
 
-        public AgeCategory AgeCategory { get; set; }
+        public string AgeCategory { get; set; }
     }
 }

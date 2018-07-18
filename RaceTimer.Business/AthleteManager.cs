@@ -180,7 +180,6 @@ namespace RaceTimer.Business
                     athleteList.Add(
                         new AthleteCsv
                         {
-                            Id = ath.Id,
                             Bib = ath.Bib,
                             FirstName = ath.FirstName,
                             LastName = ath.LastName,

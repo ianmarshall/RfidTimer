@@ -92,7 +92,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
 
 
-            fCmdRet = RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
+           
 
             if (_readerProfile.InventoryMode == InventoryMode.Buffer)
             {
@@ -137,9 +137,12 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                     break;
             }
 
-            fIsInventoryScan = false;
+            if (_readerProfile.GatingEnabled)
+            {
+                ReportTags();
+            }
 
-            //  ReportTags();
+            fIsInventoryScan = false;
         }
 
         public bool CloseConnection()
@@ -171,7 +174,16 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         public bool OpenConnection()
         {
-            return _readerProfile.ConnectionType == ConnectionType.Serial ? OpenSerial() : OpenEthernet();
+            Session = Convert.ToByte((int)_readerProfile.InventorySearchMode);
+
+            var result = _readerProfile.ConnectionType == ConnectionType.Serial ? OpenSerial() : OpenEthernet();
+
+            if (result)
+            {
+                UpdateSettings(_readerProfile);
+            }
+
+            return result;
         }
 
         private bool OpenSerial()
@@ -263,6 +275,8 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             if (_readerConnected)
             {
                 RWDev.SetRfPower(ref fComAdr, Convert.ToByte(_readerProfile.PowerDbm), frmcomportindex);
+
+                setWorkMode();
             }
 
             //   byte dminfre = 0, dmaxfre = 0;
@@ -476,32 +490,47 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                         Antenna = Ant.ToString()
                     };
 
-                    if (_readerProfile.ReadingMode == ReadingMode.Desktop)
-                    {
-                        onAssignTag(tag);
-                        continue;
-
-                    }
-
-                    onRecordTag(tag);
-                    continue;
-
-                    TagsInView.AddOrUpdate(sEPC, new List<Split> { tag }, (key, tagsInView) =>
-                          {
-                              if (tagsInView.Count > 100)
-                              {
-                                  tagsInView.Clear();
-                              }
-
-                              tagsInView.Add(tag);
-                              return tagsInView;
-                          }
-                    );
-
-                    RecentTags.AddOrUpdate(sEPC, tag, (key, oldTag) => tag);
+                   recordTag(tag);
                 }
             }
         }
+
+        private void recordTag(Split tag)
+        {
+            if (_readerProfile.ReadingMode == ReadingMode.Desktop)
+            {
+                onAssignTag(tag);
+                return;
+
+            }
+
+            if (_readerProfile.GatingEnabled)
+            {
+
+
+                TagsInView.AddOrUpdate(tag.Epc, new List<Split> {tag}, (key, tagsInView) =>
+                    {
+                        if (tagsInView.Count > 100)
+                        {
+                            tagsInView.Clear();
+                        }
+
+                        tagsInView.Add(tag);
+                        return tagsInView;
+                    }
+                );
+
+                RecentTags.AddOrUpdate(tag.Epc, tag, (key, oldTag) => tag);
+
+            }
+            else
+            {
+                onRecordTag(tag);
+                
+            }
+
+        }
+
 
         private void GetRealtiemeData()
         {

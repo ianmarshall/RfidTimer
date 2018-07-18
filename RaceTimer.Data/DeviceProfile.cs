@@ -147,6 +147,7 @@ namespace RaceTimer.Data
 
         public int PowerDbm { get; set; }
 
+        public bool GatingEnabled { get; set; }
 
         public int GatingTime { get; set; }
 

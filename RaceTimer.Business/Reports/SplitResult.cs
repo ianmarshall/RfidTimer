@@ -13,7 +13,7 @@ namespace RaceTimer.Business.Reports
         public int GendorPosition { get; set; }
         public int AgeCategoryPosition { get; set; }
         public string AthleteName { get; set; }
-        public AgeCategory AgeCategory { get; set; }
+        public string AgeCategory { get; set; }
         public string SplitTime { get; set; }
         public string RaceTime { get; set; }
         public string TimeOfDay { get; set; }

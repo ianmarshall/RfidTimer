@@ -125,8 +125,8 @@ namespace RaceTimer.Data
         public IList<Gendor> Gendors { get; } = Enum.GetValues(typeof(Gendor)).Cast<Gendor>().ToList();
 
 
-        private AgeCategory _ageCategory { get; set; }
-        public AgeCategory AgeCategory
+        private string _ageCategory { get; set; }
+        public string AgeCategory
         {
             get { return _ageCategory; }
             set
@@ -177,8 +177,8 @@ namespace RaceTimer.Data
 
     public enum Gendor
     {
-        Male,
-        Female
+        M,
+        F
     }
 
     public enum AgeCategory

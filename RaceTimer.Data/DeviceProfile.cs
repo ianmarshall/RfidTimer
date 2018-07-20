@@ -5,12 +5,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Configuration;
 
 namespace RaceTimer.Data
 {
     public class RaceTimerContext : DbContext
     {
-        public RaceTimerContext() : base("name=RaceTimerDatabase")
+        private static readonly string ConnectionName = $"name={ConfigurationManager.AppSettings["connectionName"]}";
+
+        public RaceTimerContext() : base(ConnectionName)
         {
         }
         public DbSet<Settings> Settings { get; set; }
@@ -97,7 +100,7 @@ namespace RaceTimer.Data
         Buffer
     }
 
-    public class ReaderProfile : INotifyPropertyChanged, System.ComponentModel.IDataErrorInfo
+    public class ReaderProfile : INotifyPropertyChanged, IDataErrorInfo
     {
         public ReaderProfile()
         {

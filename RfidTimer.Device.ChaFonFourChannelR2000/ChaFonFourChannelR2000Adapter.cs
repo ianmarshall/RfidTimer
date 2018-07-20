@@ -302,8 +302,10 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         }
 
         public event EventHandler<EventArgs> OnRecordTag;
+        public event EventHandler<EventArgs> OnRecordTags;
 
         public event EventHandler<EventArgs> OnAssignTag;
+        public event EventHandler<EventArgs> OnAssignTags;
         public event EventHandler<EventArgs> OnReportTags;
 
         private void setWorkMode()
@@ -458,6 +460,9 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                     }
                 }
                 m = 0;
+
+
+                List<string> epsList = new List<string>();
                 for (CardIndex = 0; CardIndex < CardNum; CardIndex++)
                 {
                     EPClen = daw[m] + 1;
@@ -469,6 +474,14 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
                     {
                         return;
                     }
+
+
+                    if (epsList.Contains(sEPC))
+                    {
+                        continue;
+                    }
+                    epsList.Add(sEPC);
+
                     IntPtr ptrWnd = IntPtr.Zero;
                     //  ptrWnd = FindWindow(null, "UHFReader288 Demo V1.16");
                     if (ptrWnd != IntPtr.Zero) // 检查当前统计窗口是否打开
@@ -959,6 +972,11 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
         private void onAssignTag(EventArgs e)
         {
             OnAssignTag?.Invoke(this, e);
+        }
+
+        private void onAssignTags(EventArgs e)
+        {
+            OnAssignTags?.Invoke(this, e);
         }
 
         private void onReportTags(EventArgs e)

@@ -85,14 +85,8 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         public bool BeginReading()
         {
-
-
             RecentTags.Clear();
             TagsInView.Clear();
-
-
-
-           
 
             if (_readerProfile.InventoryMode == InventoryMode.Buffer)
             {
@@ -101,7 +95,7 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
             }
 
             // Create a timer with a two second interval.
-            _aTimer = new System.Timers.Timer(200);
+            _aTimer = new System.Timers.Timer(100);
             // Hook up the Elapsed event for the timer. 
             _aTimer.Elapsed += TimerTick;
             _aTimer.AutoReset = true;
@@ -250,6 +244,9 @@ namespace RfidTimer.Device.ChaFonFourChannelR2000
 
         public bool StopReading()
         {
+            RecentTags.Clear();
+            TagsInView.Clear();
+
             switch (_readerProfile.InventoryMode)
             {
                 case InventoryMode.Answer:
